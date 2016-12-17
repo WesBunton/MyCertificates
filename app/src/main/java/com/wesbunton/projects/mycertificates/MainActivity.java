@@ -3,14 +3,13 @@ package com.wesbunton.projects.mycertificates;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -43,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }, new String[]{}, null, null, -1, null);
-
-                Toast.makeText(MainActivity.this, "Button clicked...", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -64,7 +61,17 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_about) {
+            // Build the alert
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+            alertDialog.setTitle("About My Certificates");
+            alertDialog.setPositiveButton("OK", null);
+            alertDialog.setMessage("Go to https://wesbunton.github.io more info");
+
+            // Show the alert
+            AlertDialog alert = alertDialog.create();
+            alert.show();
+
             return true;
         }
 
