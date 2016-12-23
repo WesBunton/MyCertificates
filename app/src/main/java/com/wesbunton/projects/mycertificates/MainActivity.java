@@ -1,8 +1,10 @@
 package com.wesbunton.projects.mycertificates;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Show tip card
+//        FragmentManager fragmentManager = getFragmentManager();
+//        android.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         Button btnListCerts = (Button) findViewById(R.id.btn_listCerts);
         btnListCerts.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
             alertDialog.setTitle("About My Certificates");
             alertDialog.setPositiveButton("OK", null);
-            alertDialog.setMessage("Go to https://wesbunton.github.io more info");
+            alertDialog.setMessage("Go to wesbunton.github.io more info");
 
             // Show the alert
             AlertDialog alert = alertDialog.create();
