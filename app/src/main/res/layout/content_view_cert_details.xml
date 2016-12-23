@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_key_management"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.wesbunton.projects.mycertificates.Activity_ViewCertChainDetails"
+    tools:showIn="@layout/activity_view_cert_details">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/Txt_Alias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alias:" />
+
+        <EditText
+            android:id="@+id/editTxt_Alias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_Alias"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_PubKeyAlg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_Alias"
+            android:text="Key Algorithm:" />
+
+        <EditText
+            android:id="@+id/editTxt_PubKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_PubKeyAlg"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_PubKeySize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_PubKey"
+            android:text="Key Size:" />
+
+        <EditText
+            android:id="@+id/editTxt_PubKeySize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_PubKeySize"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_PubModulus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_PubKeySize"
+            android:text="Public Key Modulus:" />
+
+        <EditText
+            android:id="@+id/editTxt_PubModulus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_PubModulus"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_PubExponent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_PubModulus"
+            android:text="Public Key Exponent:" />
+
+        <EditText
+            android:id="@+id/editTxt_PubExponent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_PubExponent"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_PublicFingerprint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_PubExponent"
+            android:text="Certificate Fingerprint:" />
+
+        <EditText
+            android:id="@+id/editTxt_PublicFingerprint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_PublicFingerprint"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_NotBefore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_PublicFingerprint"
+            android:text="Valid Not Before:" />
+
+        <EditText
+            android:id="@+id/editTxt_NotBefore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_NotBefore"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_NotAfter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_NotBefore"
+            android:text="Expires:" />
+
+        <EditText
+            android:id="@+id/editTxt_NotAfter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_NotAfter"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_SubDN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_NotAfter"
+            android:text="Subject Name:" />
+
+        <EditText
+            android:id="@+id/editTxt_SubDN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_SubDN"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_IssuerDN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_SubDN"
+            android:text="Issuer Name:" />
+
+        <EditText
+            android:id="@+id/editTxt_IssuerDN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_IssuerDN"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_Serial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_IssuerDN"
+            android:text="Serial:" />
+
+        <EditText
+            android:id="@+id/editTxt_Serial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_Serial"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_Version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_Serial"
+            android:text="Version:" />
+
+        <EditText
+            android:id="@+id/editTxt_Version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_Version"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_Usage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_Version"
+            android:text="Key Usage:" />
+
+        <EditText
+            android:id="@+id/editTxt_Usage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_Usage"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_VerifiedBy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_Usage"
+            android:text="Verified by:" />
+
+        <EditText
+            android:id="@+id/editTxt_VerifiedBy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_VerifiedBy"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_SigAlg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_VerifiedBy"
+            android:text="Signature Algorithm:" />
+
+        <EditText
+            android:id="@+id/editTxt_SigAlg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_SigAlg"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/Txt_Signature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editTxt_SigAlg"
+            android:text="Signature:" />
+
+        <EditText
+            android:id="@+id/editTxt_Signature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Txt_Signature"
+            android:textIsSelectable="true"
+            android:inputType="none" />
+
+    </RelativeLayout>
+</ScrollView>

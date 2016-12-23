@@ -1,12 +1,15 @@
 package com.wesbunton.projects.mycertificates;
 
-import android.app.FragmentManager;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
-import android.support.v4.app.FragmentTransaction;
+import android.security.KeyChainException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
 
     private final String LOGTAG = MainActivity.class.getSimpleName();
 
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,9 +32,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Show tip card
-//        FragmentManager fragmentManager = getFragmentManager();
-//        android.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        // Code for showing tip cards here
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerTips);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
 
         Button btnListCerts = (Button) findViewById(R.id.btn_listCerts);
         btnListCerts.setOnClickListener(new View.OnClickListener() {
@@ -38,14 +47,55 @@ public class MainActivity extends AppCompatActivity {
                 KeyChain.choosePrivateKeyAlias(MainActivity.this, new KeyChainAliasCallback() {
                     @Override
                     public void alias(String alias) {
+                        Log.d(LOGTAG, "Thread: " + Thread.currentThread().getName());
+                        Log.d(LOGTAG, "selected alias: " + alias);
 
-                        // Check if we're allowed access
+                        // If user denies access to the selected certificate
                         if (alias == null) {
-                            Log.d(LOGTAG, "Denied certificate access.");
+                            Log.i(LOGTAG, "Returned key alias is null");
                             return;
                         }
+
+                        // Wrapper to store the data we unpack from KeyChain
+                        CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
+                        java.security.cert.X509Certificate[] chain = null;
+
+                        // Pull data from KeyChain
+                        try {
+                            chain = KeyChain.getCertificateChain(MainActivity.this, alias);
+                        } catch (KeyChainException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        // Check if any KeyChain variables are empty
+                        if (chain == null || chain.length == 0) {
+                            alertBadAlias();    // Alert dialog sends user back to new Main Activity
+                        } else {
+                            // Pack data into wrapper
+                            certDetailsWrapper.setChainLength(chain.length);
+                            certDetailsWrapper.setAlias(alias);
+                            certDetailsWrapper.setUserCert(chain[0]);
+
+                            // Get the last in the chain for the CA cert
+                            if (chain.length > 2) {     // if there's 3 or more certs total in chain
+                                certDetailsWrapper.setCaCert(chain[(chain.length - 1)]);    // root CA is the top level certificate
+                                certDetailsWrapper.setIntermediaryCert(chain[(chain.length - 2)]);  // intermediary is below the root
+                            } else if (chain.length == 2) {     // there's only a user and ca cert
+                                certDetailsWrapper.setCaCert(chain[(chain.length - 1)]);    // root CA is the top level certificate
+                            } else if (chain.length == 1) {     // Chain consists of just user and CA cert
+                                // No cert chain exists...
+                            }
+                        }
+
+                        // Start the View Certificate Chain Details activity
+                        Intent intent = new Intent(MainActivity.this, Activity_ViewCertChainDetails.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("certDetailsWrapper", certDetailsWrapper);
+                        intent.putExtras(bundle);
+                        intent.setClass(MainActivity.this, Activity_ViewCertChainDetails.class);
+                        startActivity(intent);
                     }
-                }, new String[]{}, null, null, -1, null);
+                }, new String[] {}, null, null, -1, null);
             }
         });
     }
@@ -81,4 +131,25 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    // Method used when user taps the back button on this activity,
+    // if they select 'yes', they go back to the main activity rather than the last screen.
+    private void alertBadAlias() {
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+
+        // If the user backs out of this activity, they forfeit objects created and go back to the main activity.
+        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
+        alertDialog.setMessage("Couldn't retrieve certificate details.");
+        alertDialog.setTitle("My Certificates");
+        alertDialog.show();
+    }
+
 }

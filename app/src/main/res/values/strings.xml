@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">My Certificates</string>
     <string name="action_about">About</string>
-    <string name="btn_select_certificate">Select Certificate</string>
+    <string name="btn_Select_Cert">Select Certificate</string>
+    <string name="section_format">Certificate in chain: %1$d</string>
+    <string name="Cert_Verify_Error">Could not find verifier.</string>
+    <string name="title_activity__view_cert_chain_details">Swipe right to view cert chain</string>
 </resources>
