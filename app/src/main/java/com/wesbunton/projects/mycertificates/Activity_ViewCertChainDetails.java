@@ -145,11 +145,13 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_activity_view_cert_chain_details, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
 
             // Retrieve the certificate details to populate the data fields with
             CertDetailsWrapper certDetailsWrapper = (CertDetailsWrapper) getArguments().getSerializable("certDetails");
+
+            // Section label
+            TextView textSectionLabel = (TextView) rootView.findViewById(R.id.section_label);
+            textSectionLabel.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER), certDetailsWrapper.getChainLength()));
 
             // Build the cert chain object
             X509Certificate[] chain;
