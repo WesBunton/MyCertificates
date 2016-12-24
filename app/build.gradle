@@ -40,4 +40,14 @@ dependencies {
     compile 'com.google.guava:guava:20.0'
     compile 'com.madgag.spongycastle:pkix:1.54.0.0'
     compile 'com.madgag.spongycastle:prov:1.54.0.0'
+
+    // Material Showcase library
+    compile 'com.github.deano2390:MaterialShowcaseView:1.1.0@aar'
+
+    allprojects {
+        repositories {
+            jcenter()
+            maven { url "https://jitpack.io" }
+        }
+    }
 }

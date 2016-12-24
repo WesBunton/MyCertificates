@@ -1,6 +1,5 @@
 package com.wesbunton.projects.mycertificates;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.security.KeyChain;
@@ -8,8 +7,6 @@ import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -17,13 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+
 public class MainActivity extends AppCompatActivity {
 
     private final String LOGTAG = MainActivity.class.getSimpleName();
 
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
+    // String used to track if the tips should be launched
+    private static final String SHOWCASE_ID = "tips sequence";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +30,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Code for showing tip cards here
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerTips);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        // Show sequence of tips on first launch...
+        showTipsSequence(500);  // half a second delay (in milliseconds)
 
         Button btnListCerts = (Button) findViewById(R.id.btn_listCerts);
         btnListCerts.setOnClickListener(new View.OnClickListener() {
@@ -135,24 +130,36 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Method used when user taps the back button on this activity,
-    // if they select 'yes', they go back to the main activity rather than the last screen.
+    /**
+     * This method will display a tip on the screen when the app is
+     * first launched.
+     * @param withDelay     Delay in milliseconds for the tip to be shown.
+     */
+    private void showTipsSequence(int withDelay) {
+        new MaterialShowcaseView.Builder(this)
+                .setTarget(findViewById(R.id.btn_listCerts))
+                .setTitleText("Did you know?")
+                .setDismissText("GOT IT!")
+                .setContentText("You may be prompted to enable a lock screen to protect access to user certificates. Use this button to get started viewing your certs.")
+                .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
+                .singleUse(SHOWCASE_ID) // provide a unique ID used to ensure it is only shown once
+                .setShapePadding(96)
+                .setFadeDuration(1000)
+                .show();
+    }
+
+    /**
+     * This is an alert that is displayed when the Android KeyChain returns a null
+     * handle for the selected certificate. This would be a highly unusual instance.
+     */
     private void alertBadAlias() {
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
 
         // If the user backs out of this activity, they forfeit objects created and go back to the main activity.
-        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
-        });
+        alertDialog.setPositiveButton("OK", null);
         alertDialog.setMessage("Couldn't retrieve certificate details.");
         alertDialog.setTitle("My Certificates");
         alertDialog.show();
     }
-
 }
