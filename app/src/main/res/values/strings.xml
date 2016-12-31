@@ -5,4 +5,24 @@
     <string name="section_format">Certificate in chain: %1$d of %2$d</string>
     <string name="Cert_Verify_Error">Could not find verifier.</string>
     <string name="title_activity__view_cert_chain_details">Swipe right to view certificate chain</string>
+    <string name="issued_to">Issued to:</string>
+    <string name="common_name">Common Name:</string>
+    <string name="org_name">Organization:</string>
+    <string name="org_unit">Organizational unit:</string>
+    <string name="serial_number">Serial number:</string>
+    <string name="issued_by">Issued by:</string>
+    <string name="validity_period">Validity period:</string>
+    <string name="issued_on">Issued on:</string>
+    <string name="expires_on">Expires on:</string>
+    <string name="fingerprints">Fingerprints:</string>
+    <string name="sha256_fingerprint">SHA-256 fingerprint:</string>
+    <string name="sha1_fingerprint">SHA-1 fingerprint:</string>
+    <string name="key_specs">Key specifications:</string>
+    <string name="key_alg">Algorithm:</string>
+    <string name="key_size">Size:</string>
+    <string name="pub_modulus">Public modulus:</string>
+    <string name="pub_exponent">Public exponent:</string>
+    <string name="key_usage">Key usage:</string>
+    <string name="x509_details">X509 Details:</string>
+    <string name="x509_version">X509 version:</string>
 </resources>
