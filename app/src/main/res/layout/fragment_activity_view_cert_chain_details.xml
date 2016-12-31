@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -13,8 +13,8 @@
         android:id="@+id/section_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Section Label"
-        android:paddingBottom="10dp"/>
+        android:paddingBottom="10dp"
+        android:text="Section Label" />
 
     <ScrollView
         android:id="@+id/content_key_management"
@@ -29,263 +29,515 @@
         tools:context="com.iapws.certificatemanager.Activity_ViewCertChainDetails"
         tools:showIn="@layout/activity_view_cert_details">
 
-        <android.support.v7.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/Txt_Alias"
+            <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Alias:" />
+                android:orientation="vertical"
+                android:shrinkColumns="1">
 
-            <EditText
-                android:id="@+id/editTxt_Alias"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_Alias"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                <!-- Alias: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/Txt_PubKeyAlg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_Alias"
-                android:text="Key Algorithm:" />
+                    <TextView
+                        android:id="@+id/alias_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/alias" />
 
-            <EditText
-                android:id="@+id/editTxt_PubKey"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_PubKeyAlg"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                    <TextView
+                        android:id="@+id/alias"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
 
-            <TextView
-                android:id="@+id/Txt_PubKeySize"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/editTxt_PubKey"
-                android:text="Key Size:" />
-
-            <EditText
-                android:id="@+id/editTxt_PubKeySize"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_PubKeySize"
-                android:inputType="none"
-                android:textIsSelectable="true" />
-
-            <!--Details to hide for EC certs start here...-->
-            <!--Nesting these into another relative layout-->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/RSA_Details"
-                android:layout_below="@id/editTxt_PubKeySize">
-
+                <!-- Issued to: -->
                 <TextView
-                    android:id="@+id/Txt_PubModulus"
-                    android:layout_width="match_parent"
+                    android:id="@+id/issued_to_header"
+                    android:text="@string/issued_to"
+                    android:textStyle="bold"
                     android:layout_height="wrap_content"
-                    android:text="Public Key Modulus:" />
-
-                <EditText
-                    android:id="@+id/editTxt_PubModulus"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/Txt_PubModulus"
-                    android:inputType="none"
-                    android:textIsSelectable="true" />
+                    android:layout_marginTop="12dip"
+                    android:layout_marginStart="20dip"
+                    android:layout_marginEnd="20dip"
+                    android:layout_marginBottom="7dip" />
 
+                <!-- Common name: -->
+                <TableRow>
+                    <TextView
+                        android:id="@+id/to_common_header"
+                        android:text="@string/common_name"
+                        android:layout_marginStart="20dip" />
+
+                    <TextView
+                        android:id="@+id/to_common"
+                        android:layout_marginStart="10dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginBottom="7dip" />
+                </TableRow>
+
+                <!-- Organization: -->
+                <TableRow>
+                    <TextView
+                        android:id="@+id/to_org_header"
+                        android:text="@string/org_name"
+                        android:layout_marginStart="20dip" />
+
+                    <TextView
+                        android:id="@+id/to_org"
+                        android:layout_marginStart="10dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginBottom="7dip" />
+                </TableRow>
+
+                <!-- Organizational unit: -->
+                <TableRow>
+                    <TextView
+                        android:id="@+id/to_org_unit_header"
+                        android:text="@string/org_unit"
+                        android:layout_marginStart="20dip" />
+
+                    <TextView
+                        android:id="@+id/to_org_unit"
+                        android:layout_marginStart="10dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginBottom="7dip" />
+                </TableRow>
+
+                <!-- Issued by: -->
                 <TextView
-                    android:id="@+id/Txt_PubExponent"
+                    android:id="@+id/issued_to_header"
+                    android:text="@string/issued_by"
+                    android:textStyle="bold"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="12dip"
+                    android:layout_marginStart="20dip"
+                    android:layout_marginEnd="20dip"
+                    android:layout_marginBottom="7dip" />
+
+                <!-- Common name: -->
+                <TableRow>
+                    <TextView
+                        android:id="@+id/by_common_header"
+                        android:text="@string/common_name"
+                        android:layout_marginStart="20dip" />
+
+                    <TextView
+                        android:id="@+id/by_common"
+                        android:layout_marginStart="10dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginBottom="7dip" />
+                </TableRow>
+
+                <!-- Organization: -->
+                <TableRow>
+                    <TextView
+                        android:id="@+id/by_org_header"
+                        android:text="@string/org_name"
+                        android:layout_marginStart="20dip" />
+
+                    <TextView
+                        android:id="@+id/by_org"
+                        android:layout_marginStart="10dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginBottom="7dip" />
+                </TableRow>
+
+                <!-- Organizational unit: -->
+                <TableRow>
+                    <TextView
+                        android:id="@+id/by_org_unit_header"
+                        android:text="@string/org_unit"
+                        android:layout_marginStart="20dip" />
+
+                    <TextView
+                        android:id="@+id/by_org_unit"
+                        android:layout_marginStart="10dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginBottom="7dip" />
+                </TableRow>
+
+
+
+                <!-- Serial: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/serial_number_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/serial_number" />
+
+                    <TextView
+                        android:id="@+id/serialNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Verified By: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/verified_by_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/verified_by" />
+
+                    <TextView
+                        android:id="@+id/verifiedBy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Subject To: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/subject_to_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/subject" />
+
+                    <TextView
+                        android:id="@+id/subject"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Issuer Subject: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/issuer_subject_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/issuer_subject" />
+
+                    <TextView
+                        android:id="@+id/issuerSubject"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Key Specs: -->
+                <TextView
+                    android:id="@+id/key_specs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/editTxt_PubModulus"
-                    android:text="Public Key Exponent:" />
+                    android:layout_marginBottom="7dip"
+                    android:layout_marginEnd="20dip"
+                    android:layout_marginStart="20dip"
+                    android:layout_marginTop="12dip"
+                    android:text="@string/key_specs"
+                    android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/editTxt_PubExponent"
+                <!-- Key Algorithm: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/key_alg_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/key_alg" />
+
+                    <TextView
+                        android:id="@+id/key_alg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Key Size: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/key_size_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/key_size" />
+
+                    <TextView
+                        android:id="@+id/keySize"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Validity Dates: -->
+                <TextView
+                    android:id="@+id/validity_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/Txt_PubExponent"
-                    android:inputType="none"
-                    android:textIsSelectable="true" />
-            </RelativeLayout>
-            <!--Details to hide for EC certificates end right here.-->
+                    android:layout_marginBottom="7dip"
+                    android:layout_marginEnd="20dip"
+                    android:layout_marginStart="20dip"
+                    android:layout_marginTop="12dip"
+                    android:text="@string/validity_period"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/Txt_PublicFingerprint"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/RSA_Details"
-                android:text="Certificate Fingerprint (SHA-1):" />
+                <!-- Issued On: -->
+                <TableRow>
 
-            <EditText
-                android:id="@+id/editTxt_PublicFingerprint"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_PublicFingerprint"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                    <TextView
+                        android:id="@+id/issued_on_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/issued_on" />
 
-            <TextView
-                android:id="@+id/Txt_NotBefore"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_PublicFingerprint"
-                android:text="Valid Not Before:" />
+                    <TextView
+                        android:id="@+id/issuedOn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
 
-            <EditText
-                android:id="@+id/editTxt_NotBefore"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_NotBefore"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                <!-- Expires On: -->
+                <TableRow>
 
-            <TextView
-                android:id="@+id/Txt_NotAfter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_NotBefore"
-                android:text="Expires:" />
+                    <TextView
+                        android:id="@+id/expires_on_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/expires_on" />
 
-            <EditText
-                android:id="@+id/editTxt_NotAfter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_NotAfter"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                    <TextView
+                        android:id="@+id/expiresOn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
 
-            <TextView
-                android:id="@+id/Txt_SubDN"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_NotAfter"
-                android:text="Subject Name:" />
+                <!-- Key Usage: -->
+                <TableRow>
 
-            <EditText
-                android:id="@+id/editTxt_SubDN"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_SubDN"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                    <TextView
+                        android:id="@+id/key_usage_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/key_usage" />
 
-            <TextView
-                android:id="@+id/Txt_IssuerDN"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_SubDN"
-                android:text="Issuer Name:" />
+                    <TextView
+                        android:id="@+id/keyUsage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
 
-            <EditText
-                android:id="@+id/editTxt_IssuerDN"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_IssuerDN"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                <!-- Fingerprints: -->
+                <TextView
+                    android:id="@+id/fingerprints"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="7dip"
+                    android:layout_marginEnd="20dip"
+                    android:layout_marginStart="20dip"
+                    android:layout_marginTop="12dip"
+                    android:text="@string/fingerprints"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/Txt_Serial"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_IssuerDN"
-                android:text="Serial:" />
+                <!-- SHA-256 fingerprint: -->
+                <TableRow>
 
-            <EditText
-                android:id="@+id/editTxt_Serial"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_Serial"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                    <TextView
+                        android:id="@+id/sha256_fingerprint_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/sha256_fingerprint" />
 
-            <TextView
-                android:id="@+id/Txt_Version"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_Serial"
-                android:text="Version:" />
+                    <TextView
+                        android:id="@+id/sha256Fingerprint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
 
-            <EditText
-                android:id="@+id/editTxt_Version"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_Version"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                <!-- SHA-1 fingerprint: -->
+                <TableRow>
 
-            <TextView
-                android:id="@+id/Txt_Usage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_Version"
-                android:text="Key Usage:" />
+                    <TextView
+                        android:id="@+id/sha1_fingerprint_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/sha1_fingerprint" />
 
-            <EditText
-                android:id="@+id/editTxt_Usage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_Usage"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                    <TextView
+                        android:id="@+id/sha1Fingerprint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
 
-            <TextView
-                android:id="@+id/Txt_VerifiedBy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_Usage"
-                android:text="Verified by:" />
+                <!-- X509 Details: -->
+                <TextView
+                    android:id="@+id/x509_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="7dip"
+                    android:layout_marginEnd="20dip"
+                    android:layout_marginStart="20dip"
+                    android:layout_marginTop="12dip"
+                    android:text="@string/x509_details"
+                    android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/editTxt_VerifiedBy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_VerifiedBy"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                <!-- X509 Version: -->
+                <TableRow>
 
-            <TextView
-                android:id="@+id/Txt_SigAlg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_VerifiedBy"
-                android:text="Signature Algorithm:" />
+                    <TextView
+                        android:id="@+id/x509_version_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/x509_version" />
 
-            <EditText
-                android:id="@+id/editTxt_SigAlg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_SigAlg"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                    <TextView
+                        android:id="@+id/x509Version"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
 
-            <TextView
-                android:id="@+id/Txt_Signature"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTxt_SigAlg"
-                android:text="Signature:" />
+                <!-- Public Modulus: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/editTxt_Signature"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/Txt_Signature"
-                android:textIsSelectable="true"
-                android:inputType="none" />
+                    <TextView
+                        android:id="@+id/pub_modulus_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/pub_modulus" />
 
-        </RelativeLayout>
-        </android.support.v7.widget.CardView>
+                    <TextView
+                        android:id="@+id/pubModulus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Public Exponent: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/pub_exponent_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/pub_exponent" />
+
+                    <TextView
+                        android:id="@+id/pubExponent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Signature Algorithm: -->
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/sig_alg_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/sig_alg" />
+
+                    <TextView
+                        android:id="@+id/sigAlg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+
+                <!-- Signature: -->
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/signature_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/signature" />
+
+                    <TextView
+                        android:id="@+id/signature"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="10dip" />
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
     </ScrollView>
 </RelativeLayout>
