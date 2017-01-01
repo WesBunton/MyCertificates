@@ -338,7 +338,8 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             textViewKeySize.setText(String.valueOf(pubKeySize));
             textViewIssuedOn.setText(certificate.getNotBefore().toString());
             textViewExpiresOn.setText(certificate.getNotAfter().toString());
-            textViewSerialNumber.setText(certificate.getSerialNumber().toString(16));
+            // Serial number is in base 16, with colons inserted at every two digits, and converted to uppercase.
+            textViewSerialNumber.setText(certificate.getSerialNumber().toString(16).replaceAll("(?<=..)(..)", ":$1").toUpperCase());
             textViewX509Version.setText(String.valueOf(certificate.getVersion()));
             textViewSigAlg.setText(certificate.getSigAlgName());
             textViewSignature.setText(String.valueOf(new BigInteger(signature).toString(16)));
@@ -494,8 +495,11 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             byte[] der = cert.getEncoded();
             md.update(der);
             byte[] digest = md.digest();
-            return hexify(digest);
+            String hex = hexify(digest);
 
+            // Add colons to the hex string
+            String hexColons = hex.replaceAll("(?<=..)(..)", ":$1").toUpperCase();
+            return hexColons;
         }
 
         /**
