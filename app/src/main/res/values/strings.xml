@@ -23,7 +23,6 @@
     <string name="pub_modulus">Public modulus:</string>
     <string name="pub_exponent">Public exponent:</string>
     <string name="key_usage">Key usage:</string>
-    <string name="x509_details">X509 Details:</string>
     <string name="x509_version">X509 version:</string>
     <string name="misc">Miscellaneous Details:</string>
     <string name="alias">Alias:</string>

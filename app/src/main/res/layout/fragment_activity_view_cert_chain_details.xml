@@ -119,9 +119,54 @@
                         android:layout_marginBottom="7dip" />
                 </TableRow>
 
+                <!-- Subject To: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/subject_to_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/subject" />
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:id="@+id/subject"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="20dip" />
+                </TableRow>
+
+                <!-- Serial: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/serial_number_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/serial_number" />
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:id="@+id/serialNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="20dip" />
+                </TableRow>
+
                 <!-- Issued by: -->
                 <TextView
-                    android:id="@+id/issued_to_header"
+                    android:id="@+id/issued_by_header"
                     android:text="@string/issued_by"
                     android:textStyle="bold"
                     android:layout_height="wrap_content"
@@ -174,75 +219,6 @@
                         android:layout_marginStart="20dip"
                         android:layout_marginEnd="20dip"
                         android:layout_marginBottom="7dip" />
-                </TableRow>
-
-
-
-                <!-- Serial: -->
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/serial_number_header"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dip"
-                        android:text="@string/serial_number" />
-                </TableRow>
-                <TableRow>
-                    <TextView
-                        android:id="@+id/serialNumber"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="7dip"
-                        android:layout_marginEnd="20dip"
-                        android:layout_marginStart="20dip" />
-                </TableRow>
-
-                <!-- Verified By: -->
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/verified_by_header"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dip"
-                        android:text="@string/verified_by" />
-                </TableRow>
-                <TableRow>
-                    <TextView
-                        android:id="@+id/verifiedBy"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="7dip"
-                        android:layout_marginEnd="20dip"
-                        android:layout_marginStart="20dip" />
-                </TableRow>
-
-                <!-- Subject To: -->
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/subject_to_header"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dip"
-                        android:text="@string/subject" />
-                </TableRow>
-                <TableRow>
-                    <TextView
-                        android:id="@+id/subject"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginBottom="7dip"
-                        android:layout_marginEnd="20dip"
-                        android:layout_marginStart="20dip" />
                 </TableRow>
 
                 <!-- Issuer Subject: -->
@@ -324,6 +300,70 @@
                         android:layout_marginStart="20dip" />
                 </TableRow>
 
+                <!-- Key Usage: -->
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/key_usage_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/key_usage" />
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:id="@+id/keyUsage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="20dip" />
+                </TableRow>
+
+                <!-- Public Modulus: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/pub_modulus_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/pub_modulus" />
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:id="@+id/pubModulus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="20dip" />
+                </TableRow>
+
+                <!-- Public Exponent: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/pub_exponent_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dip"
+                        android:text="@string/pub_exponent" />
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:id="@+id/pubExponent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="7dip"
+                        android:layout_marginEnd="20dip"
+                        android:layout_marginStart="20dip" />
+                </TableRow>
+
                 <!-- Validity Dates: -->
                 <TextView
                     android:id="@+id/validity_header"
@@ -376,19 +416,21 @@
                         android:layout_marginStart="20dip" />
                 </TableRow>
 
-                <!-- Key Usage: -->
-                <TableRow>
+                <!-- Verified By: -->
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/key_usage_header"
+                        android:id="@+id/verified_by_header"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dip"
-                        android:text="@string/key_usage" />
+                        android:text="@string/verified_by" />
                 </TableRow>
                 <TableRow>
                     <TextView
-                        android:id="@+id/keyUsage"
+                        android:id="@+id/verifiedBy"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="7dip"
@@ -449,74 +491,19 @@
                         android:layout_marginStart="20dip" />
                 </TableRow>
 
-                <!-- X509 Details: -->
-                <TextView
-                    android:id="@+id/x509_details"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="7dip"
-                    android:layout_marginEnd="20dip"
-                    android:layout_marginStart="20dip"
-                    android:layout_marginTop="12dip"
-                    android:text="@string/x509_details"
-                    android:textStyle="bold" />
-
                 <!-- X509 Version: -->
                 <TableRow>
                     <TextView
                         android:id="@+id/x509_version_header"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textStyle="bold"
                         android:layout_marginStart="20dip"
                         android:text="@string/x509_version" />
                 </TableRow>
                 <TableRow>
                     <TextView
                         android:id="@+id/x509Version"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="7dip"
-                        android:layout_marginEnd="20dip"
-                        android:layout_marginStart="20dip" />
-                </TableRow>
-
-                <!-- Public Modulus: -->
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/pub_modulus_header"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dip"
-                        android:text="@string/pub_modulus" />
-                </TableRow>
-                <TableRow>
-                    <TextView
-                        android:id="@+id/pubModulus"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="7dip"
-                        android:layout_marginEnd="20dip"
-                        android:layout_marginStart="20dip" />
-                </TableRow>
-
-                <!-- Public Exponent: -->
-                <TableRow
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/pub_exponent_header"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dip"
-                        android:text="@string/pub_exponent" />
-                </TableRow>
-                <TableRow>
-                    <TextView
-                        android:id="@+id/pubExponent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="7dip"
