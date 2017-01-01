@@ -363,12 +363,50 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             }
 
             // Display the Subject information
-            textViewToCommon.setText(parseSubjectName(certificate, BCStyle.CN, false));
-            textViewToOrg.setText(parseSubjectName(certificate, BCStyle.O, false));
-            textViewToOrgUnit.setText(parseSubjectName(certificate, BCStyle.OU, false));
-            textViewByCommon.setText(parseSubjectName(certificate, BCStyle.CN, true));
-            textViewByOrg.setText(parseSubjectName(certificate, BCStyle.O, true));
-            textViewByOrgUnit.setText(parseSubjectName(certificate, BCStyle.OU, true));
+            String toCommon = parseSubjectName(certificate, BCStyle.CN, false);
+            String toOrg = parseSubjectName(certificate, BCStyle.O, false);
+            String toOrgUnit = parseSubjectName(certificate, BCStyle.OU, false);
+            String byCommon = parseSubjectName(certificate, BCStyle.CN, true);
+            String byOrg = parseSubjectName(certificate, BCStyle.O, true);
+            String byOrgUnit = parseSubjectName(certificate, BCStyle.OU, true);
+
+            if (toCommon != null) {
+                if (toCommon.contains(",")) {
+                    toCommon = toCommon.substring(0, toCommon.indexOf(','));
+                }
+            }
+            if (toOrg != null) {
+                if (toOrg.contains(",")) {
+                    toOrg = toOrg.substring(0, toOrg.indexOf(','));
+                }
+            }
+            if (toOrgUnit != null) {
+                if (toOrgUnit.contains(",")) {
+                    toOrgUnit = toOrgUnit.substring(0, toOrgUnit.indexOf(','));
+                }
+            }
+            if (byCommon != null) {
+                if (byCommon.contains(",")) {
+                    byCommon.substring(0, byCommon.indexOf(','));
+                }
+            }
+            if (byOrg != null) {
+                if (byOrg.contains(",")) {
+                    byOrg = byOrg.substring(0, byOrg.indexOf(','));
+                }
+            }
+            if (byOrgUnit != null) {
+                if (byOrgUnit.contains(",")) {
+                    byOrgUnit.substring(0, byOrgUnit.indexOf(','));
+                }
+            }
+
+            textViewToCommon.setText(toCommon);
+            textViewToOrg.setText(toOrg);
+            textViewToOrgUnit.setText(toOrgUnit);
+            textViewByCommon.setText(byCommon);
+            textViewByOrg.setText(byOrg);
+            textViewByOrgUnit.setText(byOrgUnit);
 
             // Extract the key usage
             /*
