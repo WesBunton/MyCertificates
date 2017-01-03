@@ -13,10 +13,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.x500.RDN;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x500.style.BCStyle;
@@ -235,7 +234,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
          */
         private void verifiedBy(X509Certificate[] chain, int index, View view) {
             // Link to UI fields
-            EditText editText_VerifiedBy = (EditText) view.findViewById(R.id.editTxt_VerifiedBy);
+            TextView textViewVerifiedBy = (TextView) view.findViewById(R.id.verifiedBy);
 
             // Calculate the validity
             // "Verified by: getCommonName of validator"...
@@ -248,23 +247,23 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                         X500Name name = new JcaX509CertificateHolder(chain[index+1]).getSubject();
                         RDN rawCN = name.getRDNs(BCStyle.CN)[0];
                         String cn = IETFUtils.valueToString(rawCN.getFirst().getValue());
-                        editText_VerifiedBy.setText(cn);
+                        textViewVerifiedBy.setText(cn);
                     } catch (Exception e) {     // CA cert fails signature check
                         Log.e(LOGTAG, "Exception: " + e);
-                        editText_VerifiedBy.setText(R.string.Cert_Verify_Error);
+                        textViewVerifiedBy.setText(R.string.Cert_Verify_Error);
                     }
                 } else if (isSelfSigned(chain[index])) {   // self-signed cert
                     X500Name name = new JcaX509CertificateHolder(chain[index]).getSubject();
                     RDN rawCN = name.getRDNs(BCStyle.CN)[0];
                     String cn = IETFUtils.valueToString(rawCN.getFirst().getValue());
-                    editText_VerifiedBy.setText(cn + "\t\t(Self-Signed)");
+                    textViewVerifiedBy.setText(cn + "\t\t(Self-Signed)");
                 } else {    // No valid issuer found
-                    editText_VerifiedBy.setText("Cannot find valid issuer.");
+                    textViewVerifiedBy.setText("Cannot find valid issuer.");
                 }
             } catch (Exception e) {     // Error occurs while checking validity
                 Log.e(LOGTAG, "Exception: " + e);
                 Log.e(LOGTAG, chain[index].getSubjectDN().getName() + " - Error when attempting to validate certificate.");
-                editText_VerifiedBy.setText(R.string.Cert_Verify_Error);
+                textViewVerifiedBy.setText(R.string.Cert_Verify_Error);
             }
         }
 
@@ -280,24 +279,31 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
         private void populate(X509Certificate certificate, String alias, View view) {
 
             // UI field linking
-            EditText editText_Alias = (EditText) view.findViewById(R.id.editTxt_Alias);
-            EditText editText_PubKeyAlg = (EditText) view.findViewById(R.id.editTxt_PubKey);
-            EditText editText_PubKeySize = (EditText) view.findViewById(R.id.editTxt_PubKeySize);
-            EditText editText_PubModulus = (EditText) view.findViewById(R.id.editTxt_PubModulus);
-            EditText editText_PubExponent = (EditText) view.findViewById(R.id.editTxt_PubExponent);
-            EditText editText_PubFP = (EditText) view.findViewById(R.id.editTxt_PublicFingerprint);
-            EditText editText_NotBefore = (EditText) view.findViewById(R.id.editTxt_NotBefore);
-            EditText editText_NotAfter = (EditText) view.findViewById(R.id.editTxt_NotAfter);
-            EditText editText_SubDN = (EditText) view.findViewById(R.id.editTxt_SubDN);
-            EditText editText_IssuerDN = (EditText) view.findViewById(R.id.editTxt_IssuerDN);
-            EditText editText_Serial = (EditText) view.findViewById(R.id.editTxt_Serial);
-            EditText editText_Version = (EditText) view.findViewById(R.id.editTxt_Version);
-            EditText editText_Usage = (EditText) view.findViewById(R.id.editTxt_Usage);
-            EditText editText_sigAlg = (EditText) view.findViewById(R.id.editTxt_SigAlg);
-            EditText editText_sig = (EditText) view.findViewById(R.id.editTxt_Signature);
+            TextView textViewAlias = (TextView) view.findViewById(R.id.alias);
+            TextView textViewToCommon = (TextView) view.findViewById(R.id.to_common);
+            TextView textViewToOrg = (TextView) view.findViewById(R.id.to_org);
+            TextView textViewToOrgUnit = (TextView) view.findViewById(R.id.to_org_unit);
+            TextView textViewByCommon = (TextView) view.findViewById(R.id.by_common);
+            TextView textViewByOrg = (TextView) view.findViewById(R.id.by_org);
+            TextView textViewByOrgUnit = (TextView) view.findViewById(R.id.by_org_unit);
+            TextView textViewKeyAlg = (TextView) view.findViewById(R.id.key_alg);
+            TextView textViewKeySize = (TextView) view.findViewById(R.id.keySize);
+            TextView textViewPubModulus = (TextView) view.findViewById(R.id.pubModulus);
+            TextView textViewPubExponent = (TextView) view.findViewById(R.id.pubExponent);
+            TextView textViewSHA256Fingerprint = (TextView) view.findViewById(R.id.sha256Fingerprint);
+            TextView textViewSHA1Fingerprint = (TextView) view.findViewById(R.id.sha1Fingerprint);
+            TextView textViewIssuedOn = (TextView) view.findViewById(R.id.issuedOn);
+            TextView textViewExpiresOn = (TextView) view.findViewById(R.id.expiresOn);
+            TextView textViewSubject = (TextView) view.findViewById(R.id.subject);
+            TextView textViewIssuerSubject = (TextView) view.findViewById(R.id.issuerSubject);
+            TextView textViewSerialNumber = (TextView) view.findViewById(R.id.serialNumber);
+            TextView textViewX509Version = (TextView) view.findViewById(R.id.x509Version);
+            TextView textViewKeyUsage = (TextView) view.findViewById(R.id.keyUsage);
+            TextView textViewSigAlg = (TextView) view.findViewById(R.id.sigAlg);
+            TextView textViewSignature = (TextView) view.findViewById(R.id.signature);
 
             // Nested layout for consolidated fields that are specific to RSA keys
-            RelativeLayout rsaDetailsLayout = (RelativeLayout) view.findViewById(R.id.RSA_Details);
+            //RelativeLayout rsaDetailsLayout = (RelativeLayout) view.findViewById(R.id.RSA_Details);
 
             // Variables for calculating RSA key info
             RSAPublicKey rsaPublicKey = null;
@@ -316,42 +322,91 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                 pubKeySize = rsaPublicKey.getModulus().bitLength();
 
                 // Because the modulus is usually large, we're only displaying a subset of the string - the first 30 characters or total length, which ever is less.
-                editText_PubModulus.setText(pubModulus.toString().substring(0, Math.min(pubModulus.toString().length(), 30)) + "...");
-                editText_PubExponent.setText(exponent.toString());
-                editText_PubKeyAlg.setText(certificate.getPublicKey().getAlgorithm());
+                textViewPubModulus.setText(pubModulus.toString().substring(0, Math.min(pubModulus.toString().length(), 30)) + "...");
+                textViewPubExponent.setText(exponent.toString());
+                textViewKeyAlg.setText(certificate.getPublicKey().getAlgorithm());
             } else if (certificate.getPublicKey().getAlgorithm().matches("EC")) {
                 // Hide the fields where we've been populating RSA public key data
-                rsaDetailsLayout.setVisibility(View.GONE);
+                //rsaDetailsLayout.setVisibility(View.GONE);
 
-                editText_PubKeyAlg.setText("Elliptic Curve");
+                textViewKeyAlg.setText("Elliptic Curve");
                 ECPublicKey ecPublicKey = (ECPublicKey) certificate.getPublicKey();
                 pubKeySize = ecPublicKey.getParams().getCurve().getField().getFieldSize();
             }
 
-            editText_Alias.setText(alias);
-            editText_PubKeySize.setText(String.valueOf(pubKeySize));
-            editText_NotBefore.setText(certificate.getNotBefore().toString());
-            editText_NotAfter.setText(certificate.getNotAfter().toString());
-            editText_Serial.setText(certificate.getSerialNumber().toString(16));
-            editText_Version.setText(String.valueOf(certificate.getVersion()));
-            editText_sigAlg.setText(certificate.getSigAlgName());
-            editText_sig.setText(String.valueOf(new BigInteger(signature).toString(16)));
+            textViewAlias.setText(alias);
+            textViewKeySize.setText(String.valueOf(pubKeySize));
+            textViewIssuedOn.setText(certificate.getNotBefore().toString());
+            textViewExpiresOn.setText(certificate.getNotAfter().toString());
+            // Serial number is in base 16, with colons inserted at every two digits, and converted to uppercase.
+            textViewSerialNumber.setText(certificate.getSerialNumber().toString(16).replaceAll("(?<=..)(..)", ":$1").toUpperCase());
+            textViewX509Version.setText(String.valueOf(certificate.getVersion()));
+            textViewSigAlg.setText(certificate.getSigAlgName());
+            textViewSignature.setText(String.valueOf(new BigInteger(signature).toString(16)));
 
-            // Calculate the key fingerprint
+            // Calculate the key fingerprints
             try {
-                editText_PubFP.setText(getThumbPrint(certificate));
+                textViewSHA256Fingerprint.setText(getThumbPrint(certificate, "SHA-256"));
+                textViewSHA1Fingerprint.setText(getThumbPrint(certificate, "SHA-1"));
             } catch (CertificateEncodingException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
-                editText_PubFP.setText("Could not calculate fingerprint.");
+                textViewSHA256Fingerprint.setText(R.string.fingerprint_calc_error);
+                textViewSHA1Fingerprint.setText(R.string.fingerprint_calc_error);
             }
 
             // Display the distinguished names
             try {
-                editText_SubDN.setText(String.valueOf(PrincipalUtil.getSubjectX509Principal(certificate)));
-                editText_IssuerDN.setText(String.valueOf(PrincipalUtil.getIssuerX509Principal(certificate)));
+                textViewSubject.setText(String.valueOf(PrincipalUtil.getSubjectX509Principal(certificate)));
+                textViewIssuerSubject.setText(String.valueOf(PrincipalUtil.getIssuerX509Principal(certificate)));
             } catch (CertificateEncodingException e) {
                 Log.e(LOGTAG, "Certificate Encoding Exception: " + e);
             }
+
+            // Display the Subject information
+            String toCommon = parseSubjectName(certificate, BCStyle.CN, false);
+            String toOrg = parseSubjectName(certificate, BCStyle.O, false);
+            String toOrgUnit = parseSubjectName(certificate, BCStyle.OU, false);
+            String byCommon = parseSubjectName(certificate, BCStyle.CN, true);
+            String byOrg = parseSubjectName(certificate, BCStyle.O, true);
+            String byOrgUnit = parseSubjectName(certificate, BCStyle.OU, true);
+
+            if (toCommon != null) {
+                if (toCommon.contains(",")) {
+                    toCommon = toCommon.substring(0, toCommon.indexOf(','));
+                }
+            }
+            if (toOrg != null) {
+                if (toOrg.contains(",")) {
+                    toOrg = toOrg.substring(0, toOrg.indexOf(','));
+                }
+            }
+            if (toOrgUnit != null) {
+                if (toOrgUnit.contains(",")) {
+                    toOrgUnit = toOrgUnit.substring(0, toOrgUnit.indexOf(','));
+                }
+            }
+            if (byCommon != null) {
+                if (byCommon.contains(",")) {
+                    byCommon.substring(0, byCommon.indexOf(','));
+                }
+            }
+            if (byOrg != null) {
+                if (byOrg.contains(",")) {
+                    byOrg = byOrg.substring(0, byOrg.indexOf(','));
+                }
+            }
+            if (byOrgUnit != null) {
+                if (byOrgUnit.contains(",")) {
+                    byOrgUnit.substring(0, byOrgUnit.indexOf(','));
+                }
+            }
+
+            textViewToCommon.setText(toCommon);
+            textViewToOrg.setText(toOrg);
+            textViewToOrgUnit.setText(toOrgUnit);
+            textViewByCommon.setText(byCommon);
+            textViewByOrg.setText(byOrg);
+            textViewByOrgUnit.setText(byOrgUnit);
 
             // Extract the key usage
             /*
@@ -394,9 +449,49 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                 if (keyUsage != null) {
                     keyUsage = keyUsage.replace("null", "");    // Remove the word 'null' from string
                     keyUsage = keyUsage.trim();                 // Remove excess new lines
-                    editText_Usage.setText(keyUsage);
+                    textViewKeyUsage.setText(keyUsage);
                 }
             }
+        }
+
+        /**
+         * This method returns a string that represents a parsed X509Certificate subject based
+         * on the object identifier parameter.
+         * @param cert      X509Certificate to parse.
+         * @param objectIdentifier  Identifier to use when parsing the subject, (i.e. BCStyle.CN)
+         * @return      String that contains subject parameter or null in the event of error.
+         */
+        private String parseSubjectName(X509Certificate cert, ASN1ObjectIdentifier objectIdentifier, boolean getIssuerInfo) {
+            String retString = null;
+
+            if (!getIssuerInfo) {
+                try {
+                    X500Name name = new JcaX509CertificateHolder(cert).getSubject();
+                    if (name.getRDNs(objectIdentifier).length >= 1) {
+                        RDN rawCN = name.getRDNs(objectIdentifier)[0];
+                        retString = IETFUtils.valueToString(rawCN.getFirst().getValue());
+                    }
+                } catch (CertificateEncodingException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    String issuerSubject = String.valueOf(PrincipalUtil.getIssuerX509Principal(cert));
+
+                    // Parse the X500 Principal
+                    if (objectIdentifier == BCStyle.CN && issuerSubject.contains("CN=")) {
+                        retString = issuerSubject.substring(issuerSubject.indexOf("CN="));
+                    } else if (objectIdentifier == BCStyle.O && issuerSubject.contains("O=")) {
+                        retString = issuerSubject.substring(issuerSubject.indexOf("O="));
+                    } else if (objectIdentifier == BCStyle.OU && issuerSubject.contains("OU=")) {
+                        retString = issuerSubject.substring(issuerSubject.indexOf("OU="));
+                    }
+                } catch (CertificateEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return retString;
         }
 
         /**
@@ -432,14 +527,17 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
          * @throws NoSuchAlgorithmException
          * @throws CertificateEncodingException
          */
-        public static String getThumbPrint(X509Certificate cert)
+        public static String getThumbPrint(X509Certificate cert, String algorithm)
                 throws NoSuchAlgorithmException, CertificateEncodingException {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            MessageDigest md = MessageDigest.getInstance(algorithm);
             byte[] der = cert.getEncoded();
             md.update(der);
             byte[] digest = md.digest();
-            return hexify(digest);
+            String hex = hexify(digest);
 
+            // Add colons to the hex string
+            String hexColons = hex.replaceAll("(?<=..)(..)", ":$1").toUpperCase();
+            return hexColons;
         }
 
         /**
