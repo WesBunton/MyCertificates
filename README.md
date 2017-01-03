@@ -1,6 +1,6 @@
-# MyCertificates
+# My Certificates
 
-MyCertificates is an Android application that allows users to view details of installed X509 user security certificates. This is useful as the Android settings applications will show very little information of user security certificates.
+My Certificates is an Android application that allows users to view details of installed X509 user security certificates. This is useful as the Android settings applications will show very little information of user security certificates.
 
 ## Getting Started
 
@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Quickstart Guide
 
-Using the MyCertificate Android application is dead simple. There is a single button to list the available user certificates, and allowing access to one of those certificates will allow the application to parse the certificate and display the information to the user.  
+Using the My Certificate Android application is dead simple. There is a single button to list the available user certificates, and allowing access to one of those certificates will allow the application to parse the certificate and display the information to the user.  
 
 Note that none of this information is stored within the application. Once a user goes back to the main screen, all of the certificate information is forgotten. In fact, to display the information again, the user will need to again perform the explicit allowing of access to the certificate.
 
@@ -23,7 +23,7 @@ Prerequisite:
 You need to have an X509 certificate within a P12 file local to your Android device.  
 
 Steps:  
-1. Launch MyCertificates app.  
+1. Launch My Certificates app.  
 2. Select the "Select Certificate" button. You'll see the Android user certificate selection screen. At the bottom of this dialog is an **Install** button. Select this.  
 3. Browse to your new certificate file. Select it.  
 4. You'll be prompted to enter a password if the file is password protected (recommended for security certificates with private keys).  
@@ -35,7 +35,7 @@ Prerequisite:
 You need to have a user certificate installed on the device.  
 
 Steps:  
-1. Launch MyCertificates app.  
+1. Launch My Certificates app.  
 2. Select the "Select Certificate" button. You'll see the Android user certificate selection screen. Select the certificate to examine, and tap the **ALLOW** button.  
 3. You'll be shown a list of details for that specific user certificate. If there's other certificates within a certificate chain that include this certificate, such as its issuing CA/RA certificate, you can swipe sideways to view the details of those certificates as well.  
 
@@ -43,7 +43,7 @@ Steps:
 
 As previously noted, for security purposes, you cannot store and access user without having a lock screen enabled. Additionally, you cannot disable the use of a lock screen when user certificates are present in the Android KeyChain.
 
-MyCertificates will allow you to install new user certificates, but you cannot delete a single user certificate. This is how the Android KeyChain API has been implemented. This may change in future releases of Android, but for now the only way to delete user certificates is to go to: **Settings -> Security -> Clear credentials**. This will wipe **ALL user certificates**.
+My Certificates will allow you to install new user certificates, but you cannot delete a single user certificate. This is how the Android KeyChain API has been implemented. This may change in future releases of Android, but for now the only way to delete user certificates is to go to: **Settings -> Security -> Clear credentials**. This will wipe **ALL user certificates**.
 
 ### Future Features
 
