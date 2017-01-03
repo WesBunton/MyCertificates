@@ -12,8 +12,8 @@ Using the MyCertificate Android application is dead simple. There is a single bu
 
 Note that none of this information is stored within the application. Once a user goes back to the main screen, all of the certificate information is forgotten. In fact, to display the information again, the user will need to again perform the explicit allowing of access to the certificate.
 
-### Note about lockscreen:  
-Because the Android platform has security in mind when implementing the KeyChain security certificate store, the platform does require that users have a lockscreen enabled to successfully store an X509 user certificate. You can store CA certificates for doing things like HTTPS/TLS connections without a lockscreen.
+### Note about lock screen:  
+Because the Android platform has security in mind when implementing the KeyChain security certificate store, the platform does require that users have a lock screen enabled to successfully store an X509 user certificate. You can store CA certificates for doing things like HTTPS/TLS connections without a lock screen.
 
 When the application is launched for the first time, there is a tip shown reminding users that they system might prompt them to enable a lock screen during app use to protect their user certificates.
 
@@ -27,7 +27,7 @@ Steps:
 2. Select the "Select Certificate" button. You'll see the Android user certificate selection screen. At the bottom of this dialog is an **Install** button. Select this.  
 3. Browse to your new certificate file. Select it.  
 4. You'll be prompted to enter a password if the file is password protected (recommended for security certificates with private keys).  
-5. You'll be prompted to enter a name for the certificate. This is how you'll see the certificate labled within the list of user certificates.  
+5. You'll be prompted to enter a name for the certificate. This is how you'll see the certificate labeled within the list of user certificates.  
 6. Finally, select whether you plan to use this certificate for VPN/app use or only for Wi-Fi authentication. Then tap **OK**.  
 
 **2. View Details of existing certificate**  
@@ -37,11 +37,11 @@ You need to have a user certificate installed on the device.
 Steps:  
 1. Launch MyCertificates app.  
 2. Select the "Select Certificate" button. You'll see the Android user certificate selection screen. Select the certificate to examine, and tap the **ALLOW** button.  
-3. You'll be shown a list of details for that specific user certificate. If there's other certificates within a certificate chain that include this certificate, such as it's issuing CA/RA certificate, you can swipe sideways to view the details of those certificates as well.  
+3. You'll be shown a list of details for that specific user certificate. If there's other certificates within a certificate chain that include this certificate, such as its issuing CA/RA certificate, you can swipe sideways to view the details of those certificates as well.  
 
 ## Limitations
 
-As previously noted, for security purposes, you cannot store and access user without having a lockscreen enabled. Additionally, you cannot disable the use of a lockscreen when user certificates are present in the Android KeyChain.
+As previously noted, for security purposes, you cannot store and access user without having a lock screen enabled. Additionally, you cannot disable the use of a lock screen when user certificates are present in the Android KeyChain.
 
 MyCertificates will allow you to install new user certificates, but you cannot delete a single user certificate. This is how the Android KeyChain API has been implemented. This may change in future releases of Android, but for now the only way to delete user certificates is to go to: **Settings -> Security -> Clear credentials**. This will wipe **ALL user certificates**.
 
