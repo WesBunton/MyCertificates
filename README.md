@@ -47,6 +47,8 @@ My Certificates will allow you to install new user certificates, but you cannot 
 
 ### Future Features
 
+The next feature will allow you to select X509 certificates that are simply stored in PEM format in a local file. With this implementation, the user could inspect certificate files without having to install them, which is inconvient due to Android clear-all certificate implementation.
+
 Feel free to submit an issue to add a feature request!
 
 ## Built With
