@@ -127,6 +127,12 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        // Show tips
+        if (id == R.id.action_show_tips) {
+            showTipsOnDemand(500);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -143,6 +149,23 @@ public class MainActivity extends AppCompatActivity {
                 .setContentText("You may be prompted to enable a lock screen to protect access to user certificates. Use this button to get started viewing your certs.")
                 .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
                 .singleUse(SHOWCASE_ID) // provide a unique ID used to ensure it is only shown once
+                .setShapePadding(96)
+                .setFadeDuration(1000)
+                .show();
+    }
+
+    /**
+     * This method will display a tip on the screen when the app is
+     * first launched.
+     * @param withDelay     Delay in milliseconds for the tip to be shown.
+     */
+    private void showTipsOnDemand(int withDelay) {
+        new MaterialShowcaseView.Builder(this)
+                .setTarget(findViewById(R.id.btn_listCerts))
+                .setTitleText("Did you know?")
+                .setDismissText("GOT IT!")
+                .setContentText("You may be prompted to enable a lock screen to protect access to user certificates. Use this button to get started viewing your certs.")
+                .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
                 .setShapePadding(96)
                 .setFadeDuration(1000)
                 .show();
