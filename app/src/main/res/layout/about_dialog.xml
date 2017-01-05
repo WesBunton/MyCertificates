@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/appLogoContentDisc"
+        android:id="@+id/appLogo"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="20dp"
+        android:src="@mipmap/ic_launcher"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appTitle"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:layout_toEndOf="@+id/appLogo"
+        android:layout_marginTop="26dp"
+        android:layout_marginStart="15dp"
+        android:text="@string/about_dialog_title"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/appVersion"
+        android:textSize="12sp"
+        android:layout_below="@+id/appTitle"
+        android:layout_toEndOf="@+id/appLogo"
+        android:layout_marginStart="15dp"
+        android:text="@string/appVersion"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appCredit"
+        android:layout_below="@+id/appLogo"
+        android:layout_marginStart="10dp"
+        android:autoLink="web"
+        android:layout_marginTop="10dp"
+        android:text="@string/appCredit"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appIconCredit1"
+        android:layout_below="@+id/appCredit"
+        android:layout_marginStart="10dp"
+        android:autoLink="web"
+        android:layout_marginTop="10dp"
+        android:text="@string/appIconCredit1"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appIconCredit2"
+        android:layout_below="@+id/appIconCredit1"
+        android:layout_marginStart="10dp"
+        android:autoLink="web"
+        android:layout_marginTop="10dp"
+        android:text="@string/appIconCredit2"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appIconCredit3"
+        android:layout_below="@+id/appIconCredit2"
+        android:layout_marginStart="10dp"
+        android:autoLink="web"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/appIconCredit3"/>
+
+</RelativeLayout>

@@ -25,7 +25,6 @@
     <string name="pub_exponent">Public exponent:</string>
     <string name="key_usage">Key usage:</string>
     <string name="x509_version">X509 version:</string>
-    <string name="misc">Miscellaneous Details:</string>
     <string name="alias">Alias:</string>
     <string name="subject">Subject name:</string>
     <string name="issuer_subject">Issuer subject:</string>
@@ -33,4 +32,11 @@
     <string name="sig_alg">Signature Algorithm:</string>
     <string name="signature">Signature:</string>
     <string name="fingerprint_calc_error">Could not calculate fingerprint.</string>
+    <string name="about_dialog_title">My Certificates</string>
+    <string name="appLogoContentDisc">App Icon</string>
+    <string name="appVersion">Version 1.0</string>
+    <string name="appCredit">For more info:\nWesBunton.github.io</string>
+    <string name="appIconCredit1">Icons were made by:\nhttp://www.flaticon.com/authors/flat-icons</string>
+    <string name="appIconCredit2">See more icons at:\nhttp://www.flaticon.com</string>
+    <string name="appIconCredit3">Icons licensed by:\nhttp://creativecommons.org/licenses/by/3.0/</string>
 </resources>

@@ -13,8 +13,7 @@
         android:id="@+id/section_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        android:text="Section Label" />
+        android:paddingBottom="10dp" />
 
     <ScrollView
         android:id="@+id/content_key_management"
@@ -26,8 +25,7 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="26dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="com.iapws.certificatemanager.Activity_ViewCertChainDetails"
-        tools:showIn="@layout/activity_view_cert_details">
+        tools:context="com.iapws.certificatemanager.Activity_ViewCertChainDetails" >
 
         <LinearLayout
             android:layout_width="match_parent"
