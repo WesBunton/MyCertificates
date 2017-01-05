@@ -10,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -38,7 +37,6 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
- * CLASSIFICATION: UNCLASSIFIED
  * Author: Wesley Bunton
  * Date: December 2016
  * Description: This class contains a tabbed activity for displaying certificate
@@ -94,21 +92,6 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
         // Do not need the 3-dot menu on this activity
         //getMenuInflater().inflate(R.menu.menu_activity_view_cert_chain_details, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_about) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**

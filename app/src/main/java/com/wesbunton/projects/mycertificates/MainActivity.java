@@ -16,6 +16,11 @@ import android.widget.Button;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
+/**
+ * This is the class for the main activity of the My Certificates application.
+ * This dialog will handle the main screen button(s) onClick behavior and the
+ * menu options.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private final String LOGTAG = MainActivity.class.getSimpleName();
@@ -109,20 +114,14 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_about) {
-            // Build the alert
-            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-            alertDialog.setTitle("About My Certificates");
-            alertDialog.setPositiveButton("OK", null);
-            alertDialog.setMessage("Go to wesbunton.github.io more info");
-
-            // TODO - Add reference for free icon
-            // <div>Icons made by <a href="http://www.flaticon.com/authors/flat-icons" title="Flat Icons">Flat Icons</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
-
-            // Show the alert
-            AlertDialog alert = alertDialog.create();
-            alert.show();
+            // Show the About dialog
+            // TODO - Programmatically populate the version number in the About dialog.
+            new AlertDialog.Builder(MainActivity.this)
+                    .setCancelable(true)
+                    .setView(R.layout.about_dialog)
+                    .create()
+                    .show();
 
             return true;
         }
