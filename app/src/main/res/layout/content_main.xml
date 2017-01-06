@@ -13,17 +13,49 @@
     tools:context="com.wesbunton.projects.mycertificates.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txt_HellowWorld"
-        android:text="Hello World!" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn_listCerts"
-        android:layout_below="@+id/txt_HellowWorld"
         android:layout_centerHorizontal="true"
-        android:text="Select Certificate"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="50dp"
+        android:text="@string/btn_Select_Cert"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:scrollbars="vertical"
+        android:id="@+id/recyclerTips"
+        android:layout_below="@+id/btn_listCerts" />
+
+<!--
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cardView"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            app:cardCornerRadius="4dp"
+            android:layout_marginTop="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txt_cardTextTop" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txt_cardTextBottom"/>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+-->
 </RelativeLayout>

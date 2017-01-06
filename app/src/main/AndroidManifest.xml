@@ -3,7 +3,7 @@
     package="com.wesbunton.projects.mycertificates">
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -17,7 +17,22 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="wesbunton.github.io"
+                    android:scheme="http" />
+            </intent-filter>
         </activity>
+
+        <activity
+            android:name=".Activity_ViewCertChainDetails"
+            android:label="@string/title_activity__view_cert_chain_details"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
     </application>
 
 </manifest>
