@@ -2,7 +2,8 @@
     <string name="app_name">My Certificates</string>
     <string name="action_about">About</string>
     <string name="action_show_tips">Show Tips</string>
-    <string name="btn_Select_Cert">Select Certificate</string>
+    <string name="btn_Select_Cert">Inspect Certificate from Store</string>
+    <string name="btn_From_File">Inspect Certificate from File</string>
     <string name="section_format">Certificate in chain: %1$d of %2$d</string>
     <string name="Cert_Verify_Error">Could not find verifier.</string>
     <string name="title_activity__view_cert_chain_details">Swipe right to view certificate chain</string>
@@ -39,4 +40,9 @@
     <string name="appIconCredit1">Icons were made by:\nhttp://www.flaticon.com/authors/flat-icons</string>
     <string name="appIconCredit2">See more icons at:\nhttp://www.flaticon.com</string>
     <string name="appIconCredit3">Icons licensed by:\nhttp://creativecommons.org/licenses/by/3.0/</string>
+    <string name="set_alias_cert_from_file">N/A - Certificate is not installed</string>
+    <string name="certificate_error_title">Certificate Error</string>
+    <string name="error_message_convert_pem_cert">Failed to convert PEM data to certificate.</string>
+    <string name="file_error_title">File Error</string>
+    <string name="error_message_file_read_error">Failed to read file.\nAre you sure it contains PEM certificate data?</string>
 </resources>
