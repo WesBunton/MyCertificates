@@ -45,4 +45,12 @@
     <string name="error_message_convert_pem_cert">Failed to convert PEM data to certificate.</string>
     <string name="file_error_title">File Error</string>
     <string name="error_message_file_read_error">Failed to read file.\nAre you sure it contains PEM certificate data?</string>
+    <string name="p12_password_alert_title">Enter Password</string>
+    <string name="p12_password_alert_message">Enter the password to decrypt the certificate file.</string>
+    <string name="error_text">Error</string>
+    <string name="error_message_general_error">An error parsing the certificate has occurred.</string>
+    <string name="cancel_text">Cancel</string>
+    <string name="bad_password_exception">PKCS12 key store mac invalid - wrong password or corrupted file.</string>
+    <string name="wrong_password_error_title">Wrong Password</string>
+    <string name="wrong_password_error_message">Password entered is incorrect.</string>
 </resources>

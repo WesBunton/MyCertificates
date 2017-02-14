@@ -57,7 +57,12 @@ public class MyCertificatesUtilities {
      */
     static X509Certificate certConverter(X509CertificateHolder certHolder) {
         try {
-            return new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
+            if (certHolder != null) {
+                X509Certificate certificate = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
+                if (certificate != null) {
+                    return certificate;
+                }
+            }
         } catch (CertificateException e) {
             e.printStackTrace();
         }

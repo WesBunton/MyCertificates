@@ -1,5 +1,7 @@
 package com.wesbunton.projects.mycertificates;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,14 +12,25 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import org.spongycastle.cert.X509CertificateHolder;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
@@ -49,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         btnListCerts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 // Prompt user to select certificate
                 KeyChain.choosePrivateKeyAlias(MainActivity.this, new KeyChainAliasCallback() {
                     @Override
@@ -126,13 +138,16 @@ public class MainActivity extends AppCompatActivity {
         // If we're done selecting a file to inspect
         if (requestCode == CHOOSE_FILE_REQUEST_CODE) {
             if (data != null) {
-                // TODO - Figure out what data types work, and how to handle non-PEM data.
                 // Parse the PEM data
-                Uri uri = data.getData();
+                final Uri uri = data.getData();
                 X509CertificateHolder certHolder;
                 certHolder = MyCertificatesUtilities.parsePemFile(MainActivity.this, uri);
                 if (certHolder == null) {
-                    MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.file_error_title), getString(R.string.error_message_file_read_error));
+                    //MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.file_error_title), getString(R.string.error_message_file_read_error));
+                    //return;
+
+                    // Assume the file is a P12 certificate
+                    processP12Certificate(MainActivity.this, uri);
                     return;
                 }
 
@@ -159,6 +174,78 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
+    }
+
+    private void processP12Certificate(final Context context, final Uri uri) {
+        // This most likely means the user has selected a p12 certificate file.
+        LayoutInflater inflater = getLayoutInflater();
+        final View myView = inflater.inflate(R.layout.p12_password_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(false);
+        builder.setView(myView);
+        final EditText providedPassword = (EditText) myView.findViewById(R.id.editTxt_p12Password);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    KeyStore p12 = KeyStore.getInstance("pkcs12");
+                    InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                    p12.load(inputStream, providedPassword.getText().toString().toCharArray());
+                    Enumeration enumeration = p12.aliases();
+                    X509Certificate certificateToInspect = null;
+                    while (enumeration.hasMoreElements()) {
+                        String alias = (String) enumeration.nextElement();
+                        X509Certificate cert = (X509Certificate) p12.getCertificate(alias);
+                        certificateToInspect = cert;
+                        Principal subject = cert.getSubjectDN();
+                        String subjectArray[] = subject.toString().split(",");
+                        for (String s : subjectArray) {
+                            String[] str = s.trim().split("=");
+                            String key = str[0];
+                            String value = str[1];
+                            System.out.println(key + " - " + value);
+                        }
+                    }
+
+                    if (certificateToInspect != null) {
+                        // Pack up the certificate details to pass to the ViewDetails activity
+                        CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
+                        certDetailsWrapper.setAlias(getString(R.string.set_alias_cert_from_file));
+                        certDetailsWrapper.setCaCert(null);
+                        certDetailsWrapper.setChainLength(1);
+                        certDetailsWrapper.setIntermediaryCert(null);
+                        certDetailsWrapper.setUserCert(certificateToInspect);
+
+                        // Start the View Certificate Chain Details activity
+                        Intent intent = new Intent(MainActivity.this, Activity_ViewCertChainDetails.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("certDetailsWrapper", certDetailsWrapper);
+                        intent.putExtras(bundle);
+                        intent.setClass(MainActivity.this, Activity_ViewCertChainDetails.class);
+                        startActivity(intent);
+                    }
+                } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | FileNotFoundException e) {
+                    e.printStackTrace();
+                    MyCertificatesUtilities.showAlertDialog(context, getString(R.string.error_text), getString(R.string.error_message_general_error));
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                    // Wrong password entered
+                    if (e.getMessage().contains(getString(R.string.bad_password_exception))) {
+                        MyCertificatesUtilities.showAlertDialog(context, getString(R.string.wrong_password_error_title), getString(R.string.wrong_password_error_message));
+                    } else {
+                        MyCertificatesUtilities.showAlertDialog(context, getString(R.string.error_text), getString(R.string.error_message_general_error));
+                    }
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel_text, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.create().show();
     }
 
     @Override
