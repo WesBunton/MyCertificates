@@ -1,6 +1,7 @@
 package com.wesbunton.projects.mycertificates;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
@@ -14,6 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import org.spongycastle.cert.X509CertificateHolder;
+
+import java.security.cert.X509Certificate;
+
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 /**
@@ -24,6 +29,8 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 public class MainActivity extends AppCompatActivity {
 
     private final String LOGTAG = MainActivity.class.getSimpleName();
+
+    private final int CHOOSE_FILE_REQUEST_CODE = 1212;
 
     // String used to track if the tips should be launched
     private static final String SHOWCASE_ID = "tips sequence";
@@ -82,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
                                 certDetailsWrapper.setIntermediaryCert(chain[(chain.length - 2)]);  // intermediary is below the root
                             } else if (chain.length == 2) {     // there's only a user and ca cert
                                 certDetailsWrapper.setCaCert(chain[(chain.length - 1)]);    // root CA is the top level certificate
-                            } else if (chain.length == 1) {     // Chain consists of just user and CA cert
+                            } else //noinspection StatementWithEmptyBody
+                                if (chain.length == 1) {     // Chain consists of just user and CA cert
                                 // No cert chain exists...
                             }
                         }
@@ -98,6 +106,59 @@ public class MainActivity extends AppCompatActivity {
                 }, new String[] {}, null, null, -1, null);
             }
         });
+
+        // Inspect certificates from file
+        Button btn_insectCertFromFile = (Button) findViewById(R.id.btn_inspectFromFile);
+        btn_insectCertFromFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Launch the file picker intent
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                startActivityForResult(intent, CHOOSE_FILE_REQUEST_CODE);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If we're done selecting a file to inspect
+        if (requestCode == CHOOSE_FILE_REQUEST_CODE) {
+            if (data != null) {
+                // TODO - Figure out what data types work, and how to handle non-PEM data.
+                // Parse the PEM data
+                Uri uri = data.getData();
+                X509CertificateHolder certHolder;
+                certHolder = MyCertificatesUtilities.parsePemFile(MainActivity.this, uri);
+                if (certHolder == null) {
+                    MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.file_error_title), getString(R.string.error_message_file_read_error));
+                    return;
+                }
+
+                X509Certificate certToInspect = MyCertificatesUtilities.certConverter(certHolder);
+                if (certToInspect == null) {
+                    MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.certificate_error_title), getString(R.string.error_message_convert_pem_cert));
+                    return;
+                }
+
+                // Pack up the certificate details to pass to the ViewDetails activity
+                CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
+                certDetailsWrapper.setAlias(getString(R.string.set_alias_cert_from_file));
+                certDetailsWrapper.setCaCert(null);
+                certDetailsWrapper.setChainLength(1);
+                certDetailsWrapper.setIntermediaryCert(null);
+                certDetailsWrapper.setUserCert(certToInspect);
+
+                // Start the View Certificate Chain Details activity
+                Intent intent = new Intent(MainActivity.this, Activity_ViewCertChainDetails.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("certDetailsWrapper", certDetailsWrapper);
+                intent.putExtras(bundle);
+                intent.setClass(MainActivity.this, Activity_ViewCertChainDetails.class);
+                startActivity(intent);
+            }
+        }
     }
 
     @Override

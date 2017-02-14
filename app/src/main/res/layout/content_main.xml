@@ -5,57 +5,24 @@
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.wesbunton.projects.mycertificates.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <Button
+        android:id="@+id/btn_listCerts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/btn_listCerts"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="10dp"
         android:text="@string/btn_Select_Cert"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btn_inspectFromFile"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_listCerts"
         android:layout_centerHorizontal="true"
-        android:scrollbars="vertical"
-        android:id="@+id/recyclerTips"
-        android:layout_below="@+id/btn_listCerts" />
-
-<!--
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/cardView"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            app:cardCornerRadius="4dp"
-            android:layout_marginTop="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txt_cardTextTop" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txt_cardTextBottom"/>
-
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
--->
+        android:text="@string/btn_From_File"/>
 </RelativeLayout>
