@@ -1,6 +1,9 @@
 package com.wesbunton.projects.mycertificates;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
@@ -9,10 +12,25 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+
+import org.spongycastle.cert.X509CertificateHolder;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
@@ -24,6 +42,8 @@ import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 public class MainActivity extends AppCompatActivity {
 
     private final String LOGTAG = MainActivity.class.getSimpleName();
+
+    private final int CHOOSE_FILE_REQUEST_CODE = 1212;
 
     // String used to track if the tips should be launched
     private static final String SHOWCASE_ID = "tips sequence";
@@ -42,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         btnListCerts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 // Prompt user to select certificate
                 KeyChain.choosePrivateKeyAlias(MainActivity.this, new KeyChainAliasCallback() {
                     @Override
@@ -82,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
                                 certDetailsWrapper.setIntermediaryCert(chain[(chain.length - 2)]);  // intermediary is below the root
                             } else if (chain.length == 2) {     // there's only a user and ca cert
                                 certDetailsWrapper.setCaCert(chain[(chain.length - 1)]);    // root CA is the top level certificate
-                            } else if (chain.length == 1) {     // Chain consists of just user and CA cert
+                            } else //noinspection StatementWithEmptyBody
+                                if (chain.length == 1) {     // Chain consists of just user and CA cert
                                 // No cert chain exists...
                             }
                         }
@@ -98,6 +118,134 @@ public class MainActivity extends AppCompatActivity {
                 }, new String[] {}, null, null, -1, null);
             }
         });
+
+        // Inspect certificates from file
+        Button btn_insectCertFromFile = (Button) findViewById(R.id.btn_inspectFromFile);
+        btn_insectCertFromFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Launch the file picker intent
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                startActivityForResult(intent, CHOOSE_FILE_REQUEST_CODE);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If we're done selecting a file to inspect
+        if (requestCode == CHOOSE_FILE_REQUEST_CODE) {
+            if (data != null) {
+                // Parse the PEM data
+                final Uri uri = data.getData();
+                X509CertificateHolder certHolder;
+                certHolder = MyCertificatesUtilities.parsePemFile(MainActivity.this, uri);
+                if (certHolder == null) {
+                    //MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.file_error_title), getString(R.string.error_message_file_read_error));
+                    //return;
+
+                    // Assume the file is a P12 certificate
+                    processP12Certificate(MainActivity.this, uri);
+                    return;
+                }
+
+                X509Certificate certToInspect = MyCertificatesUtilities.certConverter(certHolder);
+                if (certToInspect == null) {
+                    MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.certificate_error_title), getString(R.string.error_message_convert_pem_cert));
+                    return;
+                }
+
+                // Pack up the certificate details to pass to the ViewDetails activity
+                CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
+                certDetailsWrapper.setAlias(getString(R.string.set_alias_cert_from_file));
+                certDetailsWrapper.setCaCert(null);
+                certDetailsWrapper.setChainLength(1);
+                certDetailsWrapper.setIntermediaryCert(null);
+                certDetailsWrapper.setUserCert(certToInspect);
+
+                // Start the View Certificate Chain Details activity
+                Intent intent = new Intent(MainActivity.this, Activity_ViewCertChainDetails.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("certDetailsWrapper", certDetailsWrapper);
+                intent.putExtras(bundle);
+                intent.setClass(MainActivity.this, Activity_ViewCertChainDetails.class);
+                startActivity(intent);
+            }
+        }
+    }
+
+    private void processP12Certificate(final Context context, final Uri uri) {
+        // This most likely means the user has selected a p12 certificate file.
+        LayoutInflater inflater = getLayoutInflater();
+        final View myView = inflater.inflate(R.layout.p12_password_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(false);
+        builder.setView(myView);
+        final EditText providedPassword = (EditText) myView.findViewById(R.id.editTxt_p12Password);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    KeyStore p12 = KeyStore.getInstance("pkcs12");
+                    InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                    p12.load(inputStream, providedPassword.getText().toString().toCharArray());
+                    Enumeration enumeration = p12.aliases();
+                    X509Certificate certificateToInspect = null;
+                    while (enumeration.hasMoreElements()) {
+                        String alias = (String) enumeration.nextElement();
+                        X509Certificate cert = (X509Certificate) p12.getCertificate(alias);
+                        certificateToInspect = cert;
+                        Principal subject = cert.getSubjectDN();
+                        String subjectArray[] = subject.toString().split(",");
+                        for (String s : subjectArray) {
+                            String[] str = s.trim().split("=");
+                            String key = str[0];
+                            String value = str[1];
+                            System.out.println(key + " - " + value);
+                        }
+                    }
+
+                    if (certificateToInspect != null) {
+                        // Pack up the certificate details to pass to the ViewDetails activity
+                        CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
+                        certDetailsWrapper.setAlias(getString(R.string.set_alias_cert_from_file));
+                        certDetailsWrapper.setCaCert(null);
+                        certDetailsWrapper.setChainLength(1);
+                        certDetailsWrapper.setIntermediaryCert(null);
+                        certDetailsWrapper.setUserCert(certificateToInspect);
+
+                        // Start the View Certificate Chain Details activity
+                        Intent intent = new Intent(MainActivity.this, Activity_ViewCertChainDetails.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("certDetailsWrapper", certDetailsWrapper);
+                        intent.putExtras(bundle);
+                        intent.setClass(MainActivity.this, Activity_ViewCertChainDetails.class);
+                        startActivity(intent);
+                    }
+                } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | FileNotFoundException e) {
+                    e.printStackTrace();
+                    MyCertificatesUtilities.showAlertDialog(context, getString(R.string.error_text), getString(R.string.error_message_general_error));
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                    // Wrong password entered
+                    if (e.getMessage().contains(getString(R.string.bad_password_exception))) {
+                        MyCertificatesUtilities.showAlertDialog(context, getString(R.string.wrong_password_error_title), getString(R.string.wrong_password_error_message));
+                    } else {
+                        MyCertificatesUtilities.showAlertDialog(context, getString(R.string.error_text), getString(R.string.error_message_general_error));
+                    }
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel_text, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.create().show();
     }
 
     @Override
