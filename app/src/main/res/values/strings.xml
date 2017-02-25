@@ -35,7 +35,7 @@
     <string name="fingerprint_calc_error">Could not calculate fingerprint.</string>
     <string name="about_dialog_title">My Certificates</string>
     <string name="appLogoContentDisc">App Icon</string>
-    <string name="appVersion">Version 1.0</string>
+    <string name="appVersion">Version 2.1</string>
     <string name="appCredit">For more info:\nWesBunton.github.io</string>
     <string name="appIconCredit1">Icons were made by:\nhttp://www.flaticon.com/authors/flat-icons</string>
     <string name="appIconCredit2">See more icons at:\nhttp://www.flaticon.com</string>
