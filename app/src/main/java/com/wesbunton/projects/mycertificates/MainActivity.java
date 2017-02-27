@@ -3,6 +3,7 @@ package com.wesbunton.projects.mycertificates;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.security.KeyChain;
@@ -32,7 +33,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+import uk.co.deanwild.materialshowcaseview.target.ViewTarget;
 
 /**
  * This is the class for the main activity of the My Certificates application.
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Show sequence of tips on first launch...
-        showTipsSequence(500);  // half a second delay (in milliseconds)
+        showTipsSequence(100, isThisFirstLaunch());  // half a second delay (in milliseconds)
 
         Button btnListCerts = (Button) findViewById(R.id.btn_listCerts);
         btnListCerts.setOnClickListener(new View.OnClickListener() {
@@ -276,29 +280,22 @@ public class MainActivity extends AppCompatActivity {
 
         // Show tips
         if (id == R.id.action_show_tips) {
-            showTipsOnDemand(500);
+            showTipsSequence(100, isThisFirstLaunch());
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * This method will display a tip on the screen when the app is
-     * first launched.
-     * @param withDelay     Delay in milliseconds for the tip to be shown.
-     */
-    private void showTipsSequence(int withDelay) {
-        new MaterialShowcaseView.Builder(this)
-                .setTarget(findViewById(R.id.btn_listCerts))
-                .setTitleText("Did you know?")
-                .setDismissText("GOT IT!")
-                .setContentText("You may be prompted to enable a lock screen to protect access to user certificates. Use this button to get started viewing your certs.")
-                .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
-                .singleUse(SHOWCASE_ID) // provide a unique ID used to ensure it is only shown once
-                .setShapePadding(96)
-                .setFadeDuration(1000)
-                .show();
+    private boolean isThisFirstLaunch() {
+        SharedPreferences myCertsSharedPref = getSharedPreferences(MyCertsConstants.MY_PREFS, MODE_PRIVATE);
+        return myCertsSharedPref.getBoolean(MyCertsConstants.FIRST_LAUNCH, true);
+    }
+
+    private void setAppLaunchedPref() {
+        SharedPreferences.Editor myCertsSharedPrefEditor = getSharedPreferences(MyCertsConstants.MY_PREFS, MODE_PRIVATE).edit();
+        myCertsSharedPrefEditor.putBoolean(MyCertsConstants.FIRST_LAUNCH, false);
+        myCertsSharedPrefEditor.apply();
     }
 
     /**
@@ -306,16 +303,39 @@ public class MainActivity extends AppCompatActivity {
      * first launched.
      * @param withDelay     Delay in milliseconds for the tip to be shown.
      */
-    private void showTipsOnDemand(int withDelay) {
-        new MaterialShowcaseView.Builder(this)
-                .setTarget(findViewById(R.id.btn_listCerts))
-                .setTitleText("Did you know?")
-                .setDismissText("GOT IT!")
-                .setContentText("You may be prompted to enable a lock screen to protect access to user certificates. Use this button to get started viewing your certs.")
-                .setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
-                .setShapePadding(96)
-                .setFadeDuration(1000)
-                .show();
+    private void showTipsSequence(int withDelay, boolean firstLaunch) {
+        if (firstLaunch) {
+            MaterialShowcaseSequence tipsSequence = new MaterialShowcaseSequence(this);
+            ShowcaseConfig config = new ShowcaseConfig();
+            config.setDelay(withDelay);
+
+            MaterialShowcaseView lockScreenTip = new MaterialShowcaseView.Builder(this)
+                    .setTarget(findViewById(R.id.btn_listCerts))
+                    .setTitleText("Did you know?")
+                    .setContentText("You may be prompted to enable a lock screen. This is because Android wants to protect your cryptographic keys from unauthorized users.")
+                    .setDismissText("Okay!")
+                    .build();
+
+            MaterialShowcaseView issuerTip = new MaterialShowcaseView.Builder(this)
+                    .setTarget(findViewById(R.id.btn_listCerts))
+                    .setTitleText("Also...")
+                    .setContentText("If an issuer certificate is present, you'll be able to see its details as well!")
+                    .setDismissText("Got It!")
+                    .build();
+
+            MaterialShowcaseView startTip = new MaterialShowcaseView.Builder(this)
+                    .setTarget(findViewById(R.id.btn_inspectFromFile))
+                    .setTitleText("New feature!")
+                    .setContentText("You can inspect certificates from a local file. This is helpful for inspecting a certificate prior to installing it. P12, PFX and PEM format certificate files are supported.")
+                    .setDismissText("Got It!")
+                    .build();
+
+            tipsSequence.setConfig(config);
+            tipsSequence.addSequenceItem(lockScreenTip);
+            tipsSequence.addSequenceItem(issuerTip);
+            tipsSequence.addSequenceItem(startTip);
+            tipsSequence.start();
+        }
     }
 
     /**
