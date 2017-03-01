@@ -2,9 +2,13 @@
 
 My Certificates is an Android application that allows users to view details of X509 user security certificates. This is useful as the Android settings applications will show very little information of user security certificates.
 
+## Google Play Store Link  
+The latest version is available in the Google Play Store:  
+https://play.google.com/store/apps/details?id=com.wesbunton.projects.mycertificates
+
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. Soon, you'll be able to find this application in the Google Play Store on any Android device. If you'd like to build it from source, you can do so from the master branch of this repo.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. You can use the latest version from the Google Play Store now! If you'd like to build it from source, you can do so from the master branch of this repo.
 
 ## Quickstart Guide
 
@@ -30,7 +34,7 @@ Steps:
 5. You'll be prompted to enter a name for the certificate. This is how you'll see the certificate labeled within the list of user certificates.  
 6. Finally, select whether you plan to use this certificate for VPN/app use or only for Wi-Fi authentication. Then tap **OK**.  
 
-**2. View Details of installed certificate**
+**2. View Details of installed certificate**  
 Prerequisite:  
 You need to have a user certificate installed on the device. Note that this is different from simply having a CA certificate.
 
@@ -39,15 +43,15 @@ Steps:
 2. Select the "Select Certificate" button. You'll see the Android user certificate selection screen. Select the certificate to examine, and tap the **ALLOW** button.  
 3. You'll be shown a list of details for that specific user certificate. If there's other certificates within a certificate chain that include this certificate, such as its issuing CA/RA certificate, you can swipe sideways to view the details of those certificates as well.  
 
-**3. View Details of certificate from local file**
-Prerequisite:
+**3. View Details of certificate from local file**  
+Prerequisite:  
 File containing a certificate is present on the device.
 
-Steps:
-1. Launch My Certificates app.
-2. Select the "Select Certificate from File" button. You'll see the Android file selector prompt. Select a certificate file containing a P12/PFX or PEM format certificate.
-3. If you've selected a P12/PFX, you'll be prompted to enter the password to decrypt it.
-3. You'll be shown a list of details for that specific user certificate.
+Steps:  
+1. Launch My Certificates app.  
+2. Select the "Select Certificate from File" button. You'll see the Android file selector prompt. Select a certificate file containing a P12/PFX or PEM format certificate.  
+3. If you've selected a P12/PFX, you'll be prompted to enter the password to decrypt it.  
+3. You'll be shown a list of details for that specific user certificate.  
 
 ## Limitations
 
