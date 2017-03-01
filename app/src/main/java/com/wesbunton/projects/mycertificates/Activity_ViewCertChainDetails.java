@@ -35,6 +35,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Locale;
 
 /**
  * Author: Wesley Bunton
@@ -45,8 +46,6 @@ import java.security.interfaces.RSAPublicKey;
  *      in the cert chain returned from the Android KeyChain.
  */
 public class Activity_ViewCertChainDetails extends AppCompatActivity {
-
-    final String LOGTAG = Activity_ViewCertChainDetails.class.getSimpleName();
 
     private CertDetailsWrapper certDetailsWrapper = null;
 
@@ -133,7 +132,9 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
 
             // Section label
             TextView textSectionLabel = (TextView) rootView.findViewById(R.id.section_label);
-            textSectionLabel.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER), certDetailsWrapper.getChainLength()));
+            assert certDetailsWrapper != null;
+            textSectionLabel.setText(getString(R.string.section_format,
+                    getArguments().getInt(ARG_SECTION_NUMBER), certDetailsWrapper.getChainLength()));
 
             // Build the cert chain object
             X509Certificate[] chain;
@@ -142,7 +143,8 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             if (certDetailsWrapper.getIntermediaryCert() != null && certDetailsWrapper.getChainLength() > 2) {
                 chain[certDetailsWrapper.getChainLength() - 2] = certDetailsWrapper.getIntermediaryCert();
                 chain[certDetailsWrapper.getChainLength() - 1] = certDetailsWrapper.getCaCert();
-            } else if (certDetailsWrapper.getCaCert() != null) {
+            } else //noinspection StatementWithEmptyBody
+                if (certDetailsWrapper.getCaCert() != null) {
                 chain[certDetailsWrapper.getChainLength() - 1] = certDetailsWrapper.getCaCert();
             } else {
                 // No additional certs in cert chain...
@@ -183,7 +185,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                     break;
 
                 case 3:
-                    X509Certificate caCert = null;
+                    X509Certificate caCert;
                     if (certDetailsWrapper.getChainLength() > 2) {      // root CA is present in chain
                         caCert = certDetailsWrapper.getCaCert();
 
@@ -239,9 +241,10 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                     X500Name name = new JcaX509CertificateHolder(chain[index]).getSubject();
                     RDN rawCN = name.getRDNs(BCStyle.CN)[0];
                     String cn = IETFUtils.valueToString(rawCN.getFirst().getValue());
-                    textViewVerifiedBy.setText(cn + "\t\t(Self-Signed)");
+                    String commonName = cn + getString(R.string.cn_self_signed_suffix);
+                    textViewVerifiedBy.setText(commonName);
                 } else {    // No valid issuer found
-                    textViewVerifiedBy.setText("Cannot find valid issuer.");
+                    textViewVerifiedBy.setText(R.string.no_valid_issuer_error_msg);
                 }
             } catch (Exception e) {     // Error occurs while checking validity
                 Log.e(LOGTAG, "Exception: " + e);
@@ -289,9 +292,9 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             //RelativeLayout rsaDetailsLayout = (RelativeLayout) view.findViewById(R.id.RSA_Details);
 
             // Variables for calculating RSA key info
-            RSAPublicKey rsaPublicKey = null;
-            BigInteger pubModulus = null;
-            BigInteger exponent = null;
+            RSAPublicKey rsaPublicKey;
+            BigInteger pubModulus;
+            BigInteger exponent;
 
             int pubKeySize = 0;
             byte[] signature = certificate.getSignature();
@@ -305,14 +308,16 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                 pubKeySize = rsaPublicKey.getModulus().bitLength();
 
                 // Because the modulus is usually large, we're only displaying a subset of the string - the first 30 characters or total length, which ever is less.
-                textViewPubModulus.setText(pubModulus.toString().substring(0, Math.min(pubModulus.toString().length(), 30)) + "...");
-                textViewPubExponent.setText(exponent.toString());
+                String pubMod = pubModulus.toString().substring(0, Math.min(pubModulus.toString().length(), 30)) + "...";
+                textViewPubModulus.setText(pubMod);
+                String exponentStr = String.format(Locale.US, "%d", exponent);
+                textViewPubExponent.setText(exponentStr);
                 textViewKeyAlg.setText(certificate.getPublicKey().getAlgorithm());
-            } else if (certificate.getPublicKey().getAlgorithm().matches("EC")) {
+            } else if (certificate.getPublicKey().getAlgorithm().matches(getString(R.string.EC))) {
                 // Hide the fields where we've been populating RSA public key data
                 //rsaDetailsLayout.setVisibility(View.GONE);
 
-                textViewKeyAlg.setText("Elliptic Curve");
+                textViewKeyAlg.setText(R.string.elliptic_curve);
                 ECPublicKey ecPublicKey = (ECPublicKey) certificate.getPublicKey();
                 pubKeySize = ecPublicKey.getParams().getCurve().getField().getFieldSize();
             }
@@ -322,7 +327,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             textViewIssuedOn.setText(certificate.getNotBefore().toString());
             textViewExpiresOn.setText(certificate.getNotAfter().toString());
             // Serial number is in base 16, with colons inserted at every two digits, and converted to uppercase.
-            textViewSerialNumber.setText(certificate.getSerialNumber().toString(16).replaceAll("(?<=..)(..)", ":$1").toUpperCase());
+            textViewSerialNumber.setText(certificate.getSerialNumber().toString(16).replaceAll("(?<=..)(..)", ":$1").toUpperCase(Locale.US));
             textViewX509Version.setText(String.valueOf(certificate.getVersion()));
             textViewSigAlg.setText(certificate.getSigAlgName());
             textViewSignature.setText(String.valueOf(new BigInteger(signature).toString(16)));
@@ -370,7 +375,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             }
             if (byCommon != null) {
                 if (byCommon.contains(",")) {
-                    byCommon.substring(0, byCommon.indexOf(','));
+                    byCommon = byCommon.substring(0, byCommon.indexOf(','));
                 }
             }
             if (byOrg != null) {
@@ -380,7 +385,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             }
             if (byOrgUnit != null) {
                 if (byOrgUnit.contains(",")) {
-                    byOrgUnit.substring(0, byOrgUnit.indexOf(','));
+                    byOrgUnit = byOrgUnit.substring(0, byOrgUnit.indexOf(','));
                 }
             }
 
@@ -402,7 +407,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
 
             if (keyUsageFlags != null) {
                 if (keyUsageFlags[0]) {
-                    keyUsage = keyUsage + "Digital Signature\n";
+                    keyUsage = null + "Digital Signature\n";
                 }
                 if (keyUsageFlags[1]) {
                     keyUsage = keyUsage + "Non Repudiation\n";
@@ -519,8 +524,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             String hex = hexify(digest);
 
             // Add colons to the hex string
-            String hexColons = hex.replaceAll("(?<=..)(..)", ":$1").toUpperCase();
-            return hexColons;
+            return hex.replaceAll("(?<=..)(..)", ":$1").toUpperCase(Locale.US);
         }
 
         /**
@@ -534,11 +538,11 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
             char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7',
                     '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-            StringBuffer buf = new StringBuffer(bytes.length * 2);
+            StringBuilder buf = new StringBuilder(bytes.length * 2);
 
-            for (int i = 0; i < bytes.length; ++i) {
-                buf.append(hexDigits[(bytes[i] & 0xf0) >> 4]);
-                buf.append(hexDigits[bytes[i] & 0x0f]);
+            for (byte aByte : bytes) {
+                buf.append(hexDigits[(aByte & 0xf0) >> 4]);
+                buf.append(hexDigits[aByte & 0x0f]);
             }
 
             return buf.toString();
@@ -561,7 +565,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
          * @param certChainLength   Integer value indicating the number of objects
          *                          in the certificate chain.
          */
-        public SectionsPagerAdapter(FragmentManager fm, int certChainLength) {
+        SectionsPagerAdapter(FragmentManager fm, int certChainLength) {
             super(fm);
             this.pageCount = certChainLength;
         }
