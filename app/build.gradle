@@ -23,6 +23,7 @@ android {
     }
     lintOptions {
         disable 'InvalidPackage'
+        disable 'TooManyViews'
     }
 }
 
