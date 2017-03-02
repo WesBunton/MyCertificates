@@ -1,6 +1,6 @@
 # My Certificates
 
-My Certificates is an Android application that allows users to view details of X509 user security certificates. This is useful as the Android settings applications will show very little information of user security certificates.
+My Certificates is an Android application that allows users to view details of X509 security certificates.  
 
 ## Google Play Store Link  
 The latest version is available in the Google Play Store:  
@@ -12,9 +12,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Quickstart Guide
 
-Using the My Certificate Android application is dead simple. There are two buttons to list the available user certificates (either from KeyChain or a local file), and allowing access to one of those certificates will allow the application to parse the certificate and display the information to the user.
+Using the My Certificate Android application is simple. There are two buttons in the interface. One lists the available user certificates from KeyChain, another from a local file. Allowing access to one of the KeyChain certificates will allow the application to parse the certificate and display the information to the user. Similarly, supplying the password for a P12/PFX file will allow parsing of it.
 
-Note that none of this information is stored within the application. Once a user goes back to the main screen, all of the certificate information is forgotten. In fact, to display the information again, the user will need to again perform the explicit allowing of access to the certificate.
+Note that none of the certificate or key information is stored within the application. Once a user goes back to the main screen, all of the certificate information is forgotten. In fact, to display the information again, the user will need to again perform the explicit allowing of access to the certificate.
 
 ### Note about lock screen:  
 Because the Android platform has security in mind when implementing the KeyChain security certificate store, the platform does require that users have a lock screen enabled to successfully store an X509 user certificate. You can store CA certificates for doing things like HTTPS/TLS connections without a lock screen.
@@ -53,19 +53,13 @@ Steps:
 3. If you've selected a P12/PFX, you'll be prompted to enter the password to decrypt it.  
 3. You'll be shown a list of details for that specific user certificate.  
 
-## Limitations
-
-As previously noted, for security purposes, you cannot store and access user certificates without having a lock screen enabled. Additionally, you cannot disable the use of a lock screen when user certificates are present in the Android KeyChain.
-
-My Certificates will allow you to install new user certificates, but you cannot delete a single user certificate unless you're running Nougat. This is how the Android KeyChain API has been implemented. This may change in future releases of Android, but for now the only way to delete user certificates is to go to: **Settings -> Security -> Clear credentials**. This will wipe **ALL user certificates**.
-
 ### New Features!
 
 You can now select X509 certificates that are simply stored in PEM, P12, or PFX format in a local file. With this implementation, the user can inspect certificate files without having to install them, which is inconvenient due to Android clear-all certificate implementation.
 
 Feel free to submit an issue to add a feature request!
 
-## Built With
+## Built with...
 
 * This application was developed in the [Android Studio IDE v2.2.3](https://developer.android.com/studio/index.html).
 * The JRE/JVM used was v1.8.0_11.
@@ -89,10 +83,6 @@ BUILD SUCCESSFUL
 
 Total time: 48.412 secs
 ```
-
-## Running the tests
-
-At this time, there are no automated tests being performed.
 
 ## Installing
 
