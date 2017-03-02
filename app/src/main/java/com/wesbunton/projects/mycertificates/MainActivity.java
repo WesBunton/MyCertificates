@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.security.KeyChain;
@@ -21,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.spongycastle.cert.X509CertificateHolder;
 
@@ -266,13 +269,28 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_about) {
-            // Show the About dialog
-            // TODO - Programmatically populate the version number in the About dialog.
-            new AlertDialog.Builder(MainActivity.this)
+            String version = "";
+            try {
+                // Retrieve the app version number
+                PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                version = "Version " + packageInfo.versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            // Create the About dialog
+            AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
                     .setCancelable(true)
                     .setView(R.layout.about_dialog)
-                    .create()
-                    .show();
+                    .create();
+
+            // Show the About dialog
+            dialog.show();
+
+            // Display the proper app version in dialog
+            TextView txtVersion = (TextView) dialog.findViewById(R.id.appVersion);
+            assert txtVersion != null;
+            txtVersion.setText(version);
 
             return true;
         }
