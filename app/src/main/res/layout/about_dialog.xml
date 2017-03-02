@@ -31,8 +31,7 @@
         android:textSize="12sp"
         android:layout_below="@+id/appTitle"
         android:layout_toEndOf="@+id/appLogo"
-        android:layout_marginStart="15dp"
-        android:text="@string/appVersion"/>
+        android:layout_marginStart="15dp" />
 
     <TextView
         android:layout_width="match_parent"
