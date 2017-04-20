@@ -24,5 +24,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/btn_listCerts"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
         android:text="@string/btn_From_File"/>
+
+    <Button
+        android:id="@+id/btn_InspectTLS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_inspectFromFile"
+        android:layout_centerHorizontal="true"
+        android:text="Inspect TLS Cert From URL"/>
 </RelativeLayout>

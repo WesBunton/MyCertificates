@@ -45,6 +45,9 @@ dependencies {
     // Material Showcase library
     compile 'com.github.deano2390:MaterialShowcaseView:1.1.0@aar'
 
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
     allprojects {
         repositories {
             jcenter()

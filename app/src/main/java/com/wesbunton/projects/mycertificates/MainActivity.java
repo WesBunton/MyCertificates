@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
@@ -14,7 +15,7 @@ import android.security.KeyChainException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,18 +26,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.apache.commons.io.IOUtils;
 import org.spongycastle.cert.X509CertificateHolder;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
@@ -135,6 +145,96 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, CHOOSE_FILE_REQUEST_CODE);
             }
         });
+
+        // Inspect TLS Certificate
+        Button btn_inspectTlsCert = (Button) findViewById(R.id.btn_InspectTLS);
+        btn_inspectTlsCert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                URL UrlToCheck = null;
+                try {
+                    // Get URL
+                    // TODO - Replace with UI grabbed URL
+                    // TODO - Validate User input
+                    // TODO - Parse our protocol, etc.
+                    UrlToCheck = new URL("https://www.flickr.com/");
+                    new RetrieveTlsCertificate().execute(UrlToCheck);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    class RetrieveTlsCertificate extends AsyncTask<URL, Void, Certificate[]> {
+
+        // TODO - Add progress dialog
+
+        @Override
+        protected Certificate[] doInBackground(URL... params) {
+            // Previously validated
+            URL UrlToCheck = params[0];
+
+            HttpsURLConnection connection = null;
+            try {
+                // Connect to URL
+                assert UrlToCheck != null;
+                connection = (HttpsURLConnection) UrlToCheck.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // If the connection is made, get the server certificate chain
+            Certificate[] chain = null;
+            if (connection != null) {
+                try {
+                    // To fix 'Connection has not yet been established
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
+                    String someData = writer.toString();
+
+                    chain = connection.getServerCertificates();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // TODO - Maybe do cert.checkValidity here to pass along
+
+            // TODO - Combine this duplicate code later...
+            // Wrapper to store the data we unpack from KeyChain
+            CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
+            // Pack data into wrapper
+            assert chain != null;
+            certDetailsWrapper.setChainLength(chain.length);
+            certDetailsWrapper.setUserCert((X509Certificate) chain[0]);
+
+            // Get the last in the chain for the CA cert
+            if (chain.length > 2) {     // if there's 3 or more certs total in chain
+                certDetailsWrapper.setCaCert((X509Certificate) chain[(chain.length - 1)]);    // root CA is the top level certificate
+                certDetailsWrapper.setIntermediaryCert((X509Certificate) chain[(chain.length - 2)]);  // intermediary is below the root
+            } else if (chain.length == 2) {     // there's only a user and ca cert
+                certDetailsWrapper.setCaCert((X509Certificate) chain[(chain.length - 1)]);    // root CA is the top level certificate
+            } else //noinspection StatementWithEmptyBody
+                if (chain.length == 1) {     // Chain consists of just user and CA cert
+                    // No cert chain exists...
+                }
+
+            // Start the View Certificate Chain Details activity
+            Intent intent = new Intent(MainActivity.this, Activity_ViewCertChainDetails.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("certDetailsWrapper", certDetailsWrapper);
+            intent.putExtras(bundle);
+            intent.setClass(MainActivity.this, Activity_ViewCertChainDetails.class);
+            startActivity(intent);
+
+            return new Certificate[0];
+        }
+
+        @Override
+        protected void onPostExecute(Certificate[] certificates) {
+            super.onPostExecute(certificates);
+        }
     }
 
     @Override
@@ -339,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
 
             MaterialShowcaseView lockScreenTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_listCerts))
+                    .withRectangleShape()
                     .setTitleText("Did you know?")
                     .setContentText("You may be prompted to enable a lock screen. This is because Android wants to protect your cryptographic keys from unauthorized users.")
                     .setDismissText("Okay!")
@@ -346,6 +447,7 @@ public class MainActivity extends AppCompatActivity {
 
             MaterialShowcaseView issuerTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_listCerts))
+                    .withRectangleShape()
                     .setTitleText("Also...")
                     .setContentText("If an issuer certificate is present, you'll be able to see its details as well!")
                     .setDismissText("Got It!")
@@ -353,6 +455,7 @@ public class MainActivity extends AppCompatActivity {
 
             MaterialShowcaseView startTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_inspectFromFile))
+                    .withRectangleShape()
                     .setTitleText("New feature!")
                     .setContentText("You can inspect certificates from a local file. This is helpful for inspecting a certificate prior to installing it. P12, PFX and PEM format certificate files are supported.")
                     .setDismissText("Got It!")
