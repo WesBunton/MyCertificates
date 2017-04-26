@@ -33,5 +33,5 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/btn_inspectFromFile"
         android:layout_centerHorizontal="true"
-        android:text="Inspect TLS Cert From URL"/>
+        android:text="@string/inspect_tls_cert_from_url"/>
 </RelativeLayout>

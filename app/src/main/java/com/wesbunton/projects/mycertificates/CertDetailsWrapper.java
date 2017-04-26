@@ -14,6 +14,9 @@ public class CertDetailsWrapper implements Serializable {
 
     private static String LOGTAG = CertDetailsWrapper.class.getSimpleName();
 
+    // used for TLS inspection toggle
+    private boolean tlsInspection;
+
     // chain length
     private int chainLength = 1;
 
@@ -31,43 +34,47 @@ public class CertDetailsWrapper implements Serializable {
         // Intentionally left blank.
     }
 
-    public void setChainLength(int chainLength) {
+    void setTlsInspection(boolean tlsInspection) { this.tlsInspection = tlsInspection; }
+
+    void setChainLength(int chainLength) {
         this.chainLength = chainLength;
     }
 
-    public void setAlias(String alias) {
+    void setAlias(String alias) {
         this.alias = alias;
     }
 
-    public void setUserCert(X509Certificate userCert) {
+    void setUserCert(X509Certificate userCert) {
         this.userCert = userCert;
     }
 
-    public void setIntermediaryCert(X509Certificate intermediaryCert) {
+    void setIntermediaryCert(X509Certificate intermediaryCert) {
         this.intermediaryCert = intermediaryCert;
     }
 
-    public void setCaCert(X509Certificate caCert) {
+    void setCaCert(X509Certificate caCert) {
         this.caCert = caCert;
     }
 
-    public int getChainLength() {
+    boolean isTlsInspection() { return tlsInspection; }
+
+    int getChainLength() {
         return chainLength;
     }
 
-    public String getAlias() {
+    String getAlias() {
         return alias;
     }
 
-    public X509Certificate getUserCert() {
+    X509Certificate getUserCert() {
         return userCert;
     }
 
-    public X509Certificate getIntermediaryCert() {
+    X509Certificate getIntermediaryCert() {
         return intermediaryCert;
     }
 
-    public X509Certificate getCaCert() {
+    X509Certificate getCaCert() {
         return caCert;
     }
 }

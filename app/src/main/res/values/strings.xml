@@ -55,4 +55,5 @@
     <string name="no_valid_issuer_error_msg">Cannot find valid issuer.</string>
     <string name="EC">EC</string>
     <string name="elliptic_curve">Elliptic Curve</string>
+    <string name="inspect_tls_cert_from_url">Inspect TLS Cert From URL</string>
 </resources>

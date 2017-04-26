@@ -32,6 +32,8 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -156,7 +158,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                     X509Certificate userCert = certDetailsWrapper.getUserCert();
 
                     // Initiate field population
-                    populate(userCert, certDetailsWrapper.getAlias(), rootView);
+                    populate(userCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
 
                     // Use the cert chain to calculate validity
                     verifiedBy(chain, (getArguments().getInt(ARG_SECTION_NUMBER) - 1), rootView);
@@ -164,9 +166,9 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                 case 2: // Intermediary CA or root CA Cert
 
                     if (certDetailsWrapper.getIntermediaryCert() != null) {
-                        populate(certDetailsWrapper.getIntermediaryCert(), certDetailsWrapper.getAlias(), rootView);
+                        populate(certDetailsWrapper.getIntermediaryCert(), certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
                     } else {
-                        populate(certDetailsWrapper.getCaCert(), certDetailsWrapper.getAlias(), rootView);
+                        populate(certDetailsWrapper.getCaCert(), certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
                     }
 
                     // User the chain length to determine which certificate should be used for field population
@@ -178,7 +180,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                     }
 
                     // Initiate field population
-                    populate(secondCert, certDetailsWrapper.getAlias(), rootView);
+                    populate(secondCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
 
                     // Use the cert chain to calculate validity
                     verifiedBy(chain, (getArguments().getInt(ARG_SECTION_NUMBER) - 1), rootView);
@@ -190,7 +192,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                         caCert = certDetailsWrapper.getCaCert();
 
                         // Initiate field population
-                        populate(caCert, certDetailsWrapper.getAlias(), rootView);
+                        populate(caCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
 
                         // Use the cert chain to calculate validity
                         verifiedBy(chain, (getArguments().getInt(ARG_SECTION_NUMBER) - 1), rootView);
@@ -262,7 +264,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
          * @param alias         alias from KeyChain to populate the 'alias' field with.
          * @param view          View required to update the views within the activity.
          */
-        private void populate(X509Certificate certificate, String alias, View view) {
+        private void populate(X509Certificate certificate, String alias, View view, Boolean isTlsInspection) {
 
             // UI field linking
             TextView textViewAlias = (TextView) view.findViewById(R.id.alias);
@@ -322,7 +324,21 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                 pubKeySize = ecPublicKey.getParams().getCurve().getField().getFieldSize();
             }
 
-            textViewAlias.setText(alias);
+            // If this is a TLS inspection, attempt to validate certificate
+            if (isTlsInspection) {
+                try {
+                    TextView textView_aliasHeader = (TextView) view.findViewById(R.id.alias_header);
+                    textView_aliasHeader.setText("Certificate Validity:  (Not validated against CRL/OCSP)");
+                    certificate.checkValidity();
+                    textViewAlias.setText("Certificate is valid.");
+                } catch (CertificateExpiredException e) {
+                    textViewAlias.setText("Certificate is expired.");
+                } catch (CertificateNotYetValidException e) {
+                    textViewAlias.setText("Certificate may not be valid.");
+                }
+            } else {
+                textViewAlias.setText(alias);
+            }
             textViewKeySize.setText(String.valueOf(pubKeySize));
             textViewIssuedOn.setText(certificate.getNotBefore().toString());
             textViewExpiresOn.setText(certificate.getNotAfter().toString());
