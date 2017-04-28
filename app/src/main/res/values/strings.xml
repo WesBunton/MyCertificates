@@ -56,4 +56,8 @@
     <string name="EC">EC</string>
     <string name="elliptic_curve">Elliptic Curve</string>
     <string name="inspect_tls_cert_from_url">Inspect TLS Cert From URL</string>
+    <string name="alias_header_tls_inspection">Certificate Validity:  (Not validated against CRL/OCSP)</string>
+    <string name="cert_valid">Certificate is valid.</string>
+    <string name="cert_expired">Certificate is expired.</string>
+    <string name="cert_invalid">Certificate is invalid.</string>
 </resources>

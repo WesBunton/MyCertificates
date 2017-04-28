@@ -158,7 +158,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                     X509Certificate userCert = certDetailsWrapper.getUserCert();
 
                     // Initiate field population
-                    populate(userCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
+                    populate(userCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection(), certDetailsWrapper.isSslVerificationPassed());
 
                     // Use the cert chain to calculate validity
                     verifiedBy(chain, (getArguments().getInt(ARG_SECTION_NUMBER) - 1), rootView);
@@ -166,9 +166,9 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                 case 2: // Intermediary CA or root CA Cert
 
                     if (certDetailsWrapper.getIntermediaryCert() != null) {
-                        populate(certDetailsWrapper.getIntermediaryCert(), certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
+                        populate(certDetailsWrapper.getIntermediaryCert(), certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection(), certDetailsWrapper.isSslVerificationPassed());
                     } else {
-                        populate(certDetailsWrapper.getCaCert(), certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
+                        populate(certDetailsWrapper.getCaCert(), certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection(), certDetailsWrapper.isSslVerificationPassed());
                     }
 
                     // User the chain length to determine which certificate should be used for field population
@@ -180,7 +180,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                     }
 
                     // Initiate field population
-                    populate(secondCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
+                    populate(secondCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection(), certDetailsWrapper.isSslVerificationPassed());
 
                     // Use the cert chain to calculate validity
                     verifiedBy(chain, (getArguments().getInt(ARG_SECTION_NUMBER) - 1), rootView);
@@ -192,7 +192,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                         caCert = certDetailsWrapper.getCaCert();
 
                         // Initiate field population
-                        populate(caCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection());
+                        populate(caCert, certDetailsWrapper.getAlias(), rootView, certDetailsWrapper.isTlsInspection(), certDetailsWrapper.isSslVerificationPassed());
 
                         // Use the cert chain to calculate validity
                         verifiedBy(chain, (getArguments().getInt(ARG_SECTION_NUMBER) - 1), rootView);
@@ -264,7 +264,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
          * @param alias         alias from KeyChain to populate the 'alias' field with.
          * @param view          View required to update the views within the activity.
          */
-        private void populate(X509Certificate certificate, String alias, View view, Boolean isTlsInspection) {
+        private void populate(X509Certificate certificate, String alias, View view, Boolean isTlsInspection, Boolean sslVerificationPassed) {
 
             // UI field linking
             TextView textViewAlias = (TextView) view.findViewById(R.id.alias);
@@ -326,15 +326,24 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
 
             // If this is a TLS inspection, attempt to validate certificate
             if (isTlsInspection) {
+                boolean isExpired = false;
                 try {
                     TextView textView_aliasHeader = (TextView) view.findViewById(R.id.alias_header);
-                    textView_aliasHeader.setText("Certificate Validity:  (Not validated against CRL/OCSP)");
+                    textView_aliasHeader.setText(R.string.alias_header_tls_inspection);
                     certificate.checkValidity();
-                    textViewAlias.setText("Certificate is valid.");
+                    textViewAlias.setText(R.string.cert_valid);
                 } catch (CertificateExpiredException e) {
-                    textViewAlias.setText("Certificate is expired.");
+                    isExpired = true;
+                    textViewAlias.setText(R.string.cert_expired);
                 } catch (CertificateNotYetValidException e) {
-                    textViewAlias.setText("Certificate may not be valid.");
+                    textViewAlias.setText(R.string.cert_invalid);
+                }
+                // If the SSL connection wasn't trusted, inform
+                // the user that the certificate is invalid,
+                // unless we already have discovered that the cert
+                // is expired.
+                if (!sslVerificationPassed && !isExpired) {
+                    textViewAlias.setText(R.string.cert_invalid);
                 }
             } else {
                 textViewAlias.setText(alias);

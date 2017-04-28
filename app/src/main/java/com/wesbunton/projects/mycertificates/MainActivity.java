@@ -17,6 +17,8 @@ import android.security.KeyChainException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,10 +44,8 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
@@ -62,8 +62,14 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private final String LOGTAG = MainActivity.class.getSimpleName();
+
     // Request code for selecting a file
     private final int CHOOSE_FILE_REQUEST_CODE = 1212;
+
+    // This value is used to track whether or not the HTTPSURLConnection
+    // class is able to validate the SSL connection certificate.
+    private boolean sslVerificationPassed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Prompt user for URL
                 final EditText editText_url = new EditText(MainActivity.this);
+                editText_url.setMaxLines(1);
+                editText_url.setHint("https://www.google.com");
+                editText_url.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("TLS Certificate Inspection");
                 builder.setMessage("Enter URL to inspect certificate:");
@@ -184,10 +193,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Certificate[] doInBackground(URL... params) {
-            // This is used to prevent exceptions in the event the certs are not valid
-            new BypassSSLVerification();
-            BypassSSLVerification.disableSSLVerification();
-
             // Previously validated
             URL url = params[0];
             HttpsURLConnection connection;
@@ -204,18 +209,39 @@ public class MainActivity extends AppCompatActivity {
                         IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
                         // This data is not used, only pulled to open a data connection to web server
                         String someData = writer.toString();
+                        sslVerificationPassed = true;
                         // Retrieve cert chain
                         chain = connection.getServerCertificates();
                     } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
+                        Log.d(LOGTAG, "Certificate may be invalid, bypassing the SSL verification just to retrieve the certificate details...");
+                        // This is used to prevent exceptions in the event the certs are not valid
+                        BypassSSLVerification myBypass = new BypassSSLVerification();
+                        myBypass.disableSSLVerification();
+                        // Record that the cert is not trusted by the HTTPS class
+                        sslVerificationPassed = false;
+                        // Try again after enabling the SSL verification bypass
+                        try {
+                            // Re-connect after bypassing SSL verification...
+                            connection = (HttpsURLConnection) url.openConnection();
+                            // To fix 'Connection has not yet been established
+                            StringWriter writer = new StringWriter();
+                            IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
+                            // This data is not used, only pulled to open a data connection to web server
+                            String someData = writer.toString();
+                            // Retrieve cert chain
+                            chain = connection.getServerCertificates();
+                            // Reinstate the SSL verification
+                            myBypass.enabledSSLVerification();
+                        } catch (Exception e1) {
+                            return null;
+                        }
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
             }
-            
+
             // TODO - Add in verification process via BC that checks CRL/OCSP
             return chain;
         }
@@ -227,14 +253,17 @@ public class MainActivity extends AppCompatActivity {
             if (progressDialog.isShowing()) {
                 progressDialog.cancel();
             }
-            passCertDetails(certificates, true);
+
+            // Check if the chain was retrieved or not
+            if (certificates == null) {
+                MyCertificatesUtilities.showAlertDialog(MainActivity.this, "Error", "Unable to retrieve certificates.");
+            } else {
+                passCertDetails(certificates, true);
+            }
         }
     }
 
     void passCertDetails(Certificate[] chain, boolean isTlsInspeciton) {
-        // TODO - Maybe do cert.checkValidity here to pass along
-        // TODO - do a validity check, and add that to a new field in the next screen.
-
         // Wrapper to store the data we unpack from KeyChain
         CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
         // Pack data into wrapper
@@ -242,6 +271,11 @@ public class MainActivity extends AppCompatActivity {
         certDetailsWrapper.setTlsInspection(isTlsInspeciton);
         certDetailsWrapper.setChainLength(chain.length);
         certDetailsWrapper.setUserCert((X509Certificate) chain[0]);
+
+        // If TLS inspection is happening, track if the SSL connection was successful
+        if (isTlsInspeciton) {
+            certDetailsWrapper.setSslVerificationPassed(sslVerificationPassed);
+        }
 
         // Get the last in the chain for the CA cert
         if (chain.length > 2) {     // if there's 3 or more certs total in chain

@@ -10,6 +10,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -18,18 +19,20 @@ import javax.net.ssl.X509TrustManager;
  * Because the specific inspection-only use of this application, the
  * security concerns surrounding this implementation can be acceptable.
 */
-// TODO - Remove this class from any release candidate.
 public class BypassSSLVerification {
-    //Bypassing the SSL verification to execute our code successfully
-    static {
-        disableSSLVerification();
-    }
+
+    private HostnameVerifier defaultVerifier;
+    private SSLSocketFactory defaultSocketFactory;
 
     public static void main(String[] args) {
         //Access HTTPS URL and do something
     }
     //Method used for bypassing SSL verification
-    static void disableSSLVerification() {
+    void disableSSLVerification() {
+
+        // Save off the secure hostname verifier and socket factory
+        defaultVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+        defaultSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
 
         TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -62,5 +65,10 @@ public class BypassSSLVerification {
             }
         };
         HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+    }
+
+    void enabledSSLVerification() {
+        HttpsURLConnection.setDefaultHostnameVerifier(defaultVerifier);
+        HttpsURLConnection.setDefaultSSLSocketFactory(defaultSocketFactory);
     }
 }

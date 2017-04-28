@@ -30,6 +30,9 @@ public class CertDetailsWrapper implements Serializable {
     // CA Cert
     private X509Certificate caCert;
 
+    // SSL Verification
+    private boolean sslVerificationPassed;
+
     public CertDetailsWrapper() {
         // Intentionally left blank.
     }
@@ -58,6 +61,10 @@ public class CertDetailsWrapper implements Serializable {
 
     boolean isTlsInspection() { return tlsInspection; }
 
+    void setSslVerificationPassed(boolean sslVerificationPassed) {
+        this.sslVerificationPassed = sslVerificationPassed;
+    }
+
     int getChainLength() {
         return chainLength;
     }
@@ -76,5 +83,9 @@ public class CertDetailsWrapper implements Serializable {
 
     X509Certificate getCaCert() {
         return caCert;
+    }
+
+    boolean isSslVerificationPassed() {
+        return sslVerificationPassed;
     }
 }
