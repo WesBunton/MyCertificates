@@ -25,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -104,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
                             chain = KeyChain.getCertificateChain(MainActivity.this, alias);
                         } catch (KeyChainException | InterruptedException e) {
                             e.printStackTrace();
-                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, "Error", "Error occurred in retrieving certificate from store.");
+                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                    getString(R.string.error_msg_retrieve_store));
                             return;
                         }
                         passCertDetails(chain, false);
@@ -134,28 +134,37 @@ public class MainActivity extends AppCompatActivity {
                 // Prompt user for URL
                 final EditText editText_url = new EditText(MainActivity.this);
                 editText_url.setMaxLines(1);
-                editText_url.setHint("https://www.google.com");
+                editText_url.setHint(R.string.url_hint);
                 editText_url.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("TLS Certificate Inspection");
-                builder.setMessage("Enter URL to inspect certificate:");
+                builder.setTitle(R.string.tls_title);
+                builder.setMessage(R.string.tls_message);
                 builder.setView(editText_url);
-                builder.setNegativeButton("Cancel", null);
-                builder.setPositiveButton("Check Certificate", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.tls_cancel, null);
+                builder.setPositiveButton(R.string.tls_check_cert, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Validate the input
+                        boolean error = false;
                         String url = editText_url.getText().toString();
-                        // Check for https:// and add it if need be
+                        if (url.isEmpty()) {
+                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                    getString(R.string.tls_error_empty_url));
+                            error = true;
+                        } else if (!MyCertificatesUtilities.isValidUrl(url)) {
+                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                    getString(R.string.tls_error_invalid_url));
+                            error = true;
+                        }
+                        if (url.contains("http://")) {
+                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                    getString(R.string.tls_error_http));
+                            error = true;
+                        }
                         if (!url.contains("https://")) {
                             url = "https://" + url;
                         }
-
-                        if (url.isEmpty()) {
-                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, "Error", "Please enter a URL");
-                        } else if (!URLUtil.isValidUrl(url)) {
-                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, "Error", "Invalid URL");
-                        } else {
+                        if (!error) {
                             // Retrieve cert chain from validated URL
                             URL urlToCheck;
                             try {
@@ -196,48 +205,44 @@ public class MainActivity extends AppCompatActivity {
             // Previously validated
             URL url = params[0];
             HttpsURLConnection connection;
-            Certificate[] chain = null;
+            Certificate[] chain;
             try {
                 // Connect to URL
                 assert url != null;
                 connection = (HttpsURLConnection) url.openConnection();
-                // If the connection is made, get the server certificate chain
-                if (connection != null) {
-                    try {
-                        // To fix 'Connection has not yet been established' error
-                        StringWriter writer = new StringWriter();
-                        IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
-                        // This data is not used, only pulled to open a data connection to web server
-                        //noinspection ResultOfMethodCallIgnored
-                        writer.toString();
-                        sslVerificationPassed = true;
-                        // Retrieve cert chain
-                        chain = connection.getServerCertificates();
-                    } catch (IOException e) {
-                        Log.d(LOGTAG, "Certificate may be invalid, bypassing the SSL verification just to retrieve the certificate details...");
-                        // This is used to prevent exceptions in the event the certs are not valid
-                        BypassSSLVerification myBypass = new BypassSSLVerification();
-                        myBypass.disableSSLVerification();
-                        // Record that the cert is not trusted by the HTTPS class
-                        sslVerificationPassed = false;
-                        // Try again after enabling the SSL verification bypass
-                        try {
-                            // Re-connect after bypassing SSL verification...
-                            connection = (HttpsURLConnection) url.openConnection();
-                            // To fix 'Connection has not yet been established' error
-                            StringWriter writer = new StringWriter();
-                            IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
-                            // This data is not used, only pulled to open a data connection to web server
-                            //noinspection ResultOfMethodCallIgnored
-                            writer.toString();
-                            // Retrieve cert chain
-                            chain = connection.getServerCertificates();
-                            // Reinstate the SSL verification
-                            myBypass.enabledSSLVerification();
-                        } catch (Exception e1) {
-                            return null;
-                        }
-                    }
+                connection.setConnectTimeout(3000); // 3 second timeout
+                // Get the server certificate chain
+                try {
+                    // To fix 'Connection has not yet been established' error
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
+                    // This data is not used, only pulled to open a data connection to web server
+                    //noinspection ResultOfMethodCallIgnored
+                    writer.toString();
+                    sslVerificationPassed = true;
+                    // Retrieve cert chain
+                    chain = connection.getServerCertificates();
+                } catch (IOException e) {
+                    Log.d(LOGTAG, getString(R.string.log_bypassing_ssl_verification));
+                    // This is used to prevent exceptions in the event the certs are not valid
+                    BypassSSLVerification myBypass = new BypassSSLVerification();
+                    myBypass.disableSSLVerification();
+                    // Record that the cert is not trusted by the HTTPS class
+                    sslVerificationPassed = false;
+                    // Try again after enabling the SSL verification bypass
+                    // Re-connect after bypassing SSL verification...
+                    connection = (HttpsURLConnection) url.openConnection();
+                    connection.setConnectTimeout(3000); // 3 second timeout
+                    // To fix 'Connection has not yet been established' error
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
+                    // This data is not used, only pulled to open a data connection to web server
+                    //noinspection ResultOfMethodCallIgnored
+                    writer.toString();
+                    // Retrieve cert chain
+                    chain = connection.getServerCertificates();
+                    // Reinstate the SSL verification
+                    myBypass.enabledSSLVerification();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -256,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Check if the chain was retrieved or not
             if (certificates == null) {
-                MyCertificatesUtilities.showAlertDialog(MainActivity.this, "Error", "Unable to retrieve certificate.");
+                MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error), getString(R.string.error_retrieve_cert));
             } else {
                 passCertDetails(certificates, true);
             }
@@ -501,31 +506,28 @@ public class MainActivity extends AppCompatActivity {
                     .setTarget(findViewById(R.id.btn_listCerts))
                     .withRectangleShape()
                     .setTitleText("Did you know?")
-                    .setContentText("You may be prompted to enable a lock screen. This is because Android wants to protect your cryptographic keys from unauthorized users.")
+                    .setContentText(getString(R.string.tip_lock_screen))
                     .setDismissText("Okay!")
                     .build();
-
             MaterialShowcaseView issuerTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_listCerts))
                     .withRectangleShape()
                     .setTitleText("Also...")
-                    .setContentText("If an issuer certificate is present, you'll be able to see its details as well!")
+                    .setContentText(getString(R.string.tip_issuer_cert))
                     .setDismissText("Got It!")
                     .build();
-
             MaterialShowcaseView fileTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_inspectFromFile))
                     .withRectangleShape()
                     .setTitleText("Or inspect a local file...")
-                    .setContentText("You can inspect certificates from a local file too. This is helpful for inspecting a certificate prior to installing it. P12, PFX and PEM format certificate files are supported.")
+                    .setContentText(getString(R.string.tip_file))
                     .setDismissText("Got It!")
                     .build();
-
             MaterialShowcaseView tlsTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_InspectTLS))
                     .withRectangleShape()
                     .setTitleText("New feature!")
-                    .setContentText("Inspect a website's TLS certificate by typing in the URL.")
+                    .setContentText(getString(R.string.tip_tls))
                     .setDismissText("Got It!")
                     .build();
 
