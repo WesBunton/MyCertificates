@@ -7,8 +7,8 @@ android {
         applicationId "com.wesbunton.projects.mycertificates"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 6
-        versionName "2.4"
+        versionCode 7
+        versionName "3.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
