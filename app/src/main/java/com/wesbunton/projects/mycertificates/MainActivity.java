@@ -1,12 +1,15 @@
 package com.wesbunton.projects.mycertificates;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
@@ -14,6 +17,7 @@ import android.security.KeyChainException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,18 +29,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.apache.commons.io.IOUtils;
 import org.spongycastle.cert.X509CertificateHolder;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
@@ -49,8 +61,14 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private final String LOGTAG = MainActivity.class.getSimpleName();
+
     // Request code for selecting a file
     private final int CHOOSE_FILE_REQUEST_CODE = 1212;
+
+    // This value is used to track whether or not the HTTPSURLConnection
+    // class is able to validate the SSL connection certificate.
+    private boolean sslVerificationPassed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,45 +97,17 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
-                        // Wrapper to store the data we unpack from KeyChain
-                        CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
-                        java.security.cert.X509Certificate[] chain = null;
-
                         // Pull data from KeyChain
+                        java.security.cert.X509Certificate[] chain;
                         try {
                             chain = KeyChain.getCertificateChain(MainActivity.this, alias);
                         } catch (KeyChainException | InterruptedException e) {
                             e.printStackTrace();
+                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                    getString(R.string.error_msg_retrieve_store));
+                            return;
                         }
-
-                        // Check if any KeyChain variables are empty
-                        if (chain == null || chain.length == 0) {
-                            alertBadAlias();    // Alert dialog sends user back to new Main Activity
-                        } else {
-                            // Pack data into wrapper
-                            certDetailsWrapper.setChainLength(chain.length);
-                            certDetailsWrapper.setAlias(alias);
-                            certDetailsWrapper.setUserCert(chain[0]);
-
-                            // Get the last in the chain for the CA cert
-                            if (chain.length > 2) {     // if there's 3 or more certs total in chain
-                                certDetailsWrapper.setCaCert(chain[(chain.length - 1)]);    // root CA is the top level certificate
-                                certDetailsWrapper.setIntermediaryCert(chain[(chain.length - 2)]);  // intermediary is below the root
-                            } else if (chain.length == 2) {     // there's only a user and ca cert
-                                certDetailsWrapper.setCaCert(chain[(chain.length - 1)]);    // root CA is the top level certificate
-                            } else //noinspection StatementWithEmptyBody
-                                if (chain.length == 1) {     // Chain consists of just user and CA cert
-                                // No cert chain exists...
-                            }
-                        }
-
-                        // Start the View Certificate Chain Details activity
-                        Intent intent = new Intent(MainActivity.this, Activity_ViewCertChainDetails.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("certDetailsWrapper", certDetailsWrapper);
-                        intent.putExtras(bundle);
-                        intent.setClass(MainActivity.this, Activity_ViewCertChainDetails.class);
-                        startActivity(intent);
+                        passCertDetails(chain, false);
                     }
                 }, new String[] {}, null, null, -1, null);
             }
@@ -135,6 +125,181 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, CHOOSE_FILE_REQUEST_CODE);
             }
         });
+
+        // Inspect TLS Certificate
+        Button btn_inspectTlsCert = (Button) findViewById(R.id.btn_InspectTLS);
+        btn_inspectTlsCert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Prompt user for URL
+                final EditText editText_url = new EditText(MainActivity.this);
+                editText_url.setMaxLines(1);
+                editText_url.setHint(R.string.url_hint);
+                editText_url.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(R.string.tls_title);
+                builder.setMessage(R.string.tls_message);
+                builder.setView(editText_url);
+                builder.setNegativeButton(R.string.tls_cancel, null);
+                builder.setPositiveButton(R.string.tls_check_cert, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Validate the input
+                        boolean error = false;
+                        String url = editText_url.getText().toString();
+                        if (url.isEmpty()) {
+                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                    getString(R.string.tls_error_empty_url));
+                            error = true;
+                        } else if (!MyCertificatesUtilities.isValidUrl(url)) {
+                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                    getString(R.string.tls_error_invalid_url));
+                            error = true;
+                        }
+                        if (url.contains("http://")) {
+                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                    getString(R.string.tls_error_http));
+                            error = true;
+                        }
+                        if (!url.contains("https://")) {
+                            url = "https://" + url;
+                        }
+                        if (!error) {
+                            // Retrieve cert chain from validated URL
+                            URL urlToCheck;
+                            try {
+                                urlToCheck = new URL(url);
+                                new RetrieveTlsCertificate().execute(urlToCheck);
+                            } catch (MalformedURLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+                builder.show();
+            }
+        });
+    }
+
+    /**
+     * This AsyncTask handles the retrieval of the TLS certificates from the supplied URL.
+     */
+    class RetrieveTlsCertificate extends AsyncTask<URL, Void, Certificate[]> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Disable screen orientation
+            MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+            // Show progress dialog
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setCancelable(false);
+            progressDialog.setMessage("Retrieving TLS certificate...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected Certificate[] doInBackground(URL... params) {
+            // Previously validated
+            URL url = params[0];
+            HttpsURLConnection connection;
+            Certificate[] chain;
+            try {
+                // Connect to URL
+                assert url != null;
+                connection = (HttpsURLConnection) url.openConnection();
+                connection.setConnectTimeout(3000); // 3 second timeout
+                // Get the server certificate chain
+                try {
+                    // To fix 'Connection has not yet been established' error
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
+                    // This data is not used, only pulled to open a data connection to web server
+                    //noinspection ResultOfMethodCallIgnored
+                    writer.toString();
+                    sslVerificationPassed = true;
+                    // Retrieve cert chain
+                    chain = connection.getServerCertificates();
+                } catch (IOException e) {
+                    Log.d(LOGTAG, getString(R.string.log_bypassing_ssl_verification));
+                    // This is used to prevent exceptions in the event the certs are not valid
+                    BypassSSLVerification myBypass = new BypassSSLVerification();
+                    myBypass.disableSSLVerification();
+                    // Record that the cert is not trusted by the HTTPS class
+                    sslVerificationPassed = false;
+                    // Try again after enabling the SSL verification bypass
+                    // Re-connect after bypassing SSL verification...
+                    connection = (HttpsURLConnection) url.openConnection();
+                    connection.setConnectTimeout(3000); // 3 second timeout
+                    // To fix 'Connection has not yet been established' error
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
+                    // This data is not used, only pulled to open a data connection to web server
+                    //noinspection ResultOfMethodCallIgnored
+                    writer.toString();
+                    // Retrieve cert chain
+                    chain = connection.getServerCertificates();
+                    // Reinstate the SSL verification
+                    myBypass.enabledSSLVerification();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return chain;
+        }
+
+        @Override
+        protected void onPostExecute(Certificate[] certificates) {
+            super.onPostExecute(certificates);
+            // Cancel the progress dialog
+            if (progressDialog.isShowing()) {
+                progressDialog.cancel();
+            }
+
+            // Check if the chain was retrieved or not
+            if (certificates == null) {
+                MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error), getString(R.string.error_retrieve_cert));
+            } else {
+                passCertDetails(certificates, true);
+            }
+        }
+    }
+
+    void passCertDetails(Certificate[] chain, boolean isTlsInspection) {
+        // Wrapper to store the data we unpack from KeyChain
+        CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
+        // Pack data into wrapper
+        assert chain != null;
+        certDetailsWrapper.setTlsInspection(isTlsInspection);
+        certDetailsWrapper.setChainLength(chain.length);
+        certDetailsWrapper.setUserCert((X509Certificate) chain[0]);
+
+        // If TLS inspection is happening, track if the SSL connection was successful
+        if (isTlsInspection) {
+            certDetailsWrapper.setSslVerificationPassed(sslVerificationPassed);
+        }
+
+        // Get the last in the chain for the CA cert
+        if (chain.length > 2) {     // if there's 3 or more certs total in chain
+            certDetailsWrapper.setCaCert((X509Certificate) chain[(chain.length - 1)]);    // root CA is the top level certificate
+            certDetailsWrapper.setIntermediaryCert((X509Certificate) chain[(chain.length - 2)]);  // intermediary is below the root
+        } else if (chain.length == 2) {     // there's only a user and ca cert
+            certDetailsWrapper.setCaCert((X509Certificate) chain[(chain.length - 1)]);    // root CA is the top level certificate
+        } else //noinspection StatementWithEmptyBody
+            if (chain.length == 1) {     // Chain consists of just user and CA cert
+                // No cert chain exists...
+            }
+
+        // Start the View Certificate Chain Details activity
+        Intent intent = new Intent(MainActivity.this, Activity_ViewCertChainDetails.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("certDetailsWrapper", certDetailsWrapper);
+        intent.putExtras(bundle);
+        intent.setClass(MainActivity.this, Activity_ViewCertChainDetails.class);
+        startActivity(intent);
     }
 
     @Override
@@ -339,45 +504,39 @@ public class MainActivity extends AppCompatActivity {
 
             MaterialShowcaseView lockScreenTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_listCerts))
+                    .withRectangleShape()
                     .setTitleText("Did you know?")
-                    .setContentText("You may be prompted to enable a lock screen. This is because Android wants to protect your cryptographic keys from unauthorized users.")
+                    .setContentText(getString(R.string.tip_lock_screen))
                     .setDismissText("Okay!")
                     .build();
-
             MaterialShowcaseView issuerTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_listCerts))
+                    .withRectangleShape()
                     .setTitleText("Also...")
-                    .setContentText("If an issuer certificate is present, you'll be able to see its details as well!")
+                    .setContentText(getString(R.string.tip_issuer_cert))
                     .setDismissText("Got It!")
                     .build();
-
-            MaterialShowcaseView startTip = new MaterialShowcaseView.Builder(this)
+            MaterialShowcaseView fileTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_inspectFromFile))
+                    .withRectangleShape()
+                    .setTitleText("Or inspect a local file...")
+                    .setContentText(getString(R.string.tip_file))
+                    .setDismissText("Got It!")
+                    .build();
+            MaterialShowcaseView tlsTip = new MaterialShowcaseView.Builder(this)
+                    .setTarget(findViewById(R.id.btn_InspectTLS))
+                    .withRectangleShape()
                     .setTitleText("New feature!")
-                    .setContentText("You can inspect certificates from a local file. This is helpful for inspecting a certificate prior to installing it. P12, PFX and PEM format certificate files are supported.")
+                    .setContentText(getString(R.string.tip_tls))
                     .setDismissText("Got It!")
                     .build();
 
             tipsSequence.setConfig(config);
             tipsSequence.addSequenceItem(lockScreenTip);
             tipsSequence.addSequenceItem(issuerTip);
-            tipsSequence.addSequenceItem(startTip);
+            tipsSequence.addSequenceItem(fileTip);
+            tipsSequence.addSequenceItem(tlsTip);
             tipsSequence.start();
         }
-    }
-
-    /**
-     * This is an alert that is displayed when the Android KeyChain returns a null
-     * handle for the selected certificate. This would be a highly unusual instance.
-     */
-    private void alertBadAlias() {
-
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-
-        // If the user backs out of this activity, they forfeit objects created and go back to the main activity.
-        alertDialog.setPositiveButton("OK", null);
-        alertDialog.setMessage("Couldn't retrieve certificate details.");
-        alertDialog.setTitle("My Certificates");
-        alertDialog.show();
     }
 }

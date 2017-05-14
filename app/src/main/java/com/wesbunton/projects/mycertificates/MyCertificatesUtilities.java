@@ -3,6 +3,8 @@ package com.wesbunton.projects.mycertificates;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
+import android.util.Patterns;
+import android.webkit.URLUtil;
 
 import org.spongycastle.cert.X509CertificateHolder;
 import org.spongycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -13,8 +15,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 /**
  * The MyCertificatesUtilities class is comprised of static methods
@@ -22,7 +34,18 @@ import java.security.cert.X509Certificate;
  * Android application. The caller may need to pass their context in
  * for more complex tasks that require UI access or other special cases.
  */
-public class MyCertificatesUtilities {
+class MyCertificatesUtilities {
+
+    /**
+     * This is used to check the given URL is valid or not.
+     * @param url   String value containing URL to verify.
+     * @return true if url is valid, false otherwise.
+     */
+    static boolean isValidUrl(String url) {
+        Pattern p = Patterns.WEB_URL;
+        Matcher m = p.matcher(url.toLowerCase(Locale.getDefault()));
+        return m.matches();
+    }
 
     /**
      * This method will take a uri (from opening a file), and parse PEM data

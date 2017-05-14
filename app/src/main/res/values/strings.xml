@@ -55,4 +55,26 @@
     <string name="no_valid_issuer_error_msg">Cannot find valid issuer.</string>
     <string name="EC">EC</string>
     <string name="elliptic_curve">Elliptic Curve</string>
+    <string name="inspect_tls_cert_from_url">Inspect TLS Cert From URL</string>
+    <string name="alias_header_tls_inspection">Certificate Validity:\n(Not validated against CRL/OCSP)</string>
+    <string name="cert_valid">Certificate is valid.</string>
+    <string name="cert_expired">Certificate is expired.</string>
+    <string name="cert_invalid">Certificate is invalid.</string>
+    <string name="cert_not_trusted">Certificate is not trusted.</string>
+    <string name="url_hint">https://www.google.com</string>
+    <string name="tls_title">TLS Certificate Inspection</string>
+    <string name="tls_message">Enter URL to inspect certificate:</string>
+    <string name="tls_cancel">Cancel</string>
+    <string name="tls_check_cert">Check Certificate</string>
+    <string name="error">Error</string>
+    <string name="tls_error_empty_url">Please enter a URL</string>
+    <string name="tls_error_invalid_url">Invalid URL</string>
+    <string name="tls_error_http">URL must be HTTPS protocol.</string>
+    <string name="error_msg_retrieve_store">Error occurred in retrieving certificate from store.</string>
+    <string name="tip_lock_screen">You may be prompted to enable a lock screen. This is because Android wants to protect your cryptographic keys from unauthorized users.</string>
+    <string name="tip_issuer_cert">If an issuer certificate is present, you\'ll be able to see its details as well!</string>
+    <string name="tip_file">You can inspect certificates from a local file too. This is helpful for inspecting a certificate prior to installing it. P12, PFX and PEM format certificate files are supported.</string>
+    <string name="tip_tls">Inspect a website\'s TLS certificate by typing in the URL.</string>
+    <string name="error_retrieve_cert">Unable to retrieve certificate.</string>
+    <string name="log_bypassing_ssl_verification">Certificate may be invalid, bypassing the SSL verification just to retrieve the certificate details...</string>
 </resources>
