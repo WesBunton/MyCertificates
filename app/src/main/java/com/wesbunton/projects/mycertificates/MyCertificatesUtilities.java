@@ -3,6 +3,7 @@ package com.wesbunton.projects.mycertificates;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
+import android.webkit.URLUtil;
 
 import org.spongycastle.cert.X509CertificateHolder;
 import org.spongycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -15,6 +16,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 /**
  * The MyCertificatesUtilities class is comprised of static methods
