@@ -343,7 +343,7 @@ public class Activity_ViewCertChainDetails extends AppCompatActivity {
                 // unless we already have discovered that the cert
                 // is expired.
                 if (!sslVerificationPassed && !isExpired) {
-                    textViewAlias.setText(R.string.cert_invalid);
+                    textViewAlias.setText(R.string.cert_not_trusted);
                 }
             } else {
                 textViewAlias.setText(alias);

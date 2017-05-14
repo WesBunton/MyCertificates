@@ -60,6 +60,7 @@ public class BypassSSLVerification {
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
         HostnameVerifier allHostsValid = new HostnameVerifier() {
+            @SuppressLint("BadHostnameVerifier")
             public boolean verify(String hostname, SSLSession session) {
                 return true;
             }

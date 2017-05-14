@@ -204,11 +204,12 @@ public class MainActivity extends AppCompatActivity {
                 // If the connection is made, get the server certificate chain
                 if (connection != null) {
                     try {
-                        // To fix 'Connection has not yet been established
+                        // To fix 'Connection has not yet been established' error
                         StringWriter writer = new StringWriter();
                         IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
                         // This data is not used, only pulled to open a data connection to web server
-                        String someData = writer.toString();
+                        //noinspection ResultOfMethodCallIgnored
+                        writer.toString();
                         sslVerificationPassed = true;
                         // Retrieve cert chain
                         chain = connection.getServerCertificates();
@@ -223,11 +224,12 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             // Re-connect after bypassing SSL verification...
                             connection = (HttpsURLConnection) url.openConnection();
-                            // To fix 'Connection has not yet been established
+                            // To fix 'Connection has not yet been established' error
                             StringWriter writer = new StringWriter();
                             IOUtils.copy(connection.getInputStream(), writer, Charset.defaultCharset());
                             // This data is not used, only pulled to open a data connection to web server
-                            String someData = writer.toString();
+                            //noinspection ResultOfMethodCallIgnored
+                            writer.toString();
                             // Retrieve cert chain
                             chain = connection.getServerCertificates();
                             // Reinstate the SSL verification
@@ -241,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
                 return null;
             }
-
-            // TODO - Add in verification process via BC that checks CRL/OCSP
             return chain;
         }
 
@@ -256,24 +256,24 @@ public class MainActivity extends AppCompatActivity {
 
             // Check if the chain was retrieved or not
             if (certificates == null) {
-                MyCertificatesUtilities.showAlertDialog(MainActivity.this, "Error", "Unable to retrieve certificates.");
+                MyCertificatesUtilities.showAlertDialog(MainActivity.this, "Error", "Unable to retrieve certificate.");
             } else {
                 passCertDetails(certificates, true);
             }
         }
     }
 
-    void passCertDetails(Certificate[] chain, boolean isTlsInspeciton) {
+    void passCertDetails(Certificate[] chain, boolean isTlsInspection) {
         // Wrapper to store the data we unpack from KeyChain
         CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
         // Pack data into wrapper
         assert chain != null;
-        certDetailsWrapper.setTlsInspection(isTlsInspeciton);
+        certDetailsWrapper.setTlsInspection(isTlsInspection);
         certDetailsWrapper.setChainLength(chain.length);
         certDetailsWrapper.setUserCert((X509Certificate) chain[0]);
 
         // If TLS inspection is happening, track if the SSL connection was successful
-        if (isTlsInspeciton) {
+        if (isTlsInspection) {
             certDetailsWrapper.setSslVerificationPassed(sslVerificationPassed);
         }
 
