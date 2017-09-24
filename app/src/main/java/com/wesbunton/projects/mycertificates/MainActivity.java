@@ -28,6 +28,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.commons.io.IOUtils;
 import org.spongycastle.cert.X509CertificateHolder;
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * This AsyncTask handles the retrieval of the TLS certificates from the supplied URL.
      */
-    class RetrieveTlsCertificate extends AsyncTask<URL, Void, Certificate[]> {
+    private class RetrieveTlsCertificate extends AsyncTask<URL, Void, Certificate[]> {
 
         ProgressDialog progressDialog;
 
@@ -268,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     void passCertDetails(Certificate[] chain, boolean isTlsInspection) {
         // Wrapper to store the data we unpack from KeyChain
         CertDetailsWrapper certDetailsWrapper = new CertDetailsWrapper();
@@ -342,6 +344,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method will take a file URI and read in the data, and will attempt to parse the
+     * PKCS#12 information. If the parsing is successful, the method will launch the cert details activity.
+     * @param context   Caller's context.
+     * @param uri   File URI for file that contains the PKCS#12 data.
+     */
     private void processP12Certificate(final Context context, final Uri uri) {
         // This most likely means the user has selected a p12 certificate file.
         LayoutInflater inflater = getLayoutInflater();
@@ -393,6 +401,9 @@ public class MainActivity extends AppCompatActivity {
                 } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | FileNotFoundException e) {
                     e.printStackTrace();
                     MyCertificatesUtilities.showAlertDialog(context, getString(R.string.error_text), getString(R.string.error_message_general_error));
+                } catch (ClassCastException e) {
+                    e.printStackTrace();
+                    sendFeedbackPrompt(context);
                 } catch (IOException e) {
                     e.printStackTrace();
 
@@ -538,5 +549,33 @@ public class MainActivity extends AppCompatActivity {
             tipsSequence.addSequenceItem(tlsTip);
             tipsSequence.start();
         }
+    }
+
+    /**
+     * This method is used for prompting the user in the event of an error and gives them the
+     * ability to send an email to the app developer.
+     * @param context   Caller's context.
+     */
+    private void sendFeedbackPrompt(final Context context) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setTitle(R.string.error_feedback_title);
+        alertDialog.setMessage(R.string.pfx_bug_alert_message);
+        alertDialog.setNegativeButton("Never Mind", null);
+        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("message/rfc822");
+                intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.dev_email)});
+                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_email_subject));
+                intent.putExtra(Intent.EXTRA_TEXT   , "Here's a bit about what happened:");
+                try {
+                    startActivity(Intent.createChooser(intent, "Send mail..."));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(context, R.string.no_mail_client_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        alertDialog.show();
     }
 }

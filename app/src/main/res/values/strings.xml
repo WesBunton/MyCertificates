@@ -76,5 +76,10 @@
     <string name="tip_file">You can inspect certificates from a local file too. This is helpful for inspecting a certificate prior to installing it. P12, PFX and PEM format certificate files are supported.</string>
     <string name="tip_tls">Inspect a website\'s TLS certificate by typing in the URL.</string>
     <string name="error_retrieve_cert">Unable to retrieve certificate.</string>
-    <string name="log_bypassing_ssl_verification">Certificate may be invalid, bypassing the SSL verification just to retrieve the certificate details...</string>
+    <string name="log_bypassing_ssl_verification">Certificate may be invalid, bypassing the SSL verification just to retrieve the certificate details.</string>
+    <string name="pfx_bug_alert_message">So something went wrong in the crypto library while processing your file. To help out, you can email me some description of what happened. Was your file a PFX file from Windows?</string>
+    <string name="error_feedback_title">Error Feedback</string>
+    <string name="dev_email">wesley.bunton@gmail.com</string>
+    <string name="feedback_email_subject">My Certificates Error</string>
+    <string name="no_mail_client_error">There are no email clients installed.</string>
 </resources>
