@@ -65,10 +65,9 @@ class MyCertificatesUtilities {
                     return new X509CertificateHolder(pemObject.getContent());
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | SecurityException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
