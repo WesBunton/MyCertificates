@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Certificate[] certificates) {
             super.onPostExecute(certificates);
             // Cancel the progress dialog
-            if (progressDialog.isShowing()) {
+            if (progressDialog != null && progressDialog.isShowing()) {
                 progressDialog.cancel();
             }
 
