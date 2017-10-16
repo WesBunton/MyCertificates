@@ -9,6 +9,7 @@ import android.webkit.URLUtil;
 import org.spongycastle.cert.X509CertificateHolder;
 import org.spongycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.spongycastle.openssl.PEMParser;
+import org.spongycastle.util.encoders.DecoderException;
 import org.spongycastle.util.io.pem.PemObject;
 
 import java.io.BufferedReader;
@@ -54,7 +55,11 @@ class MyCertificatesUtilities {
      * @param uri       Uri from the file containing the PEM data.
      * @return          Returns an X509CertificateHolder.
      */
-    static X509CertificateHolder parsePemFile(Context context, Uri uri) {
+    static X509CertificateHolder parsePemFile(Context context, Uri uri) throws IllegalArgumentException, IllegalStateException {
+        if (context == null || uri == null) {
+            throw new IllegalArgumentException();
+        }
+
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
             if (inputStream != null) {
@@ -65,6 +70,8 @@ class MyCertificatesUtilities {
                     return new X509CertificateHolder(pemObject.getContent());
                 }
             }
+        } catch (DecoderException e) {
+            throw new IllegalStateException();
         } catch (IOException | SecurityException e) {
             e.printStackTrace();
         }
@@ -77,13 +84,15 @@ class MyCertificatesUtilities {
      * @param certHolder    Spongy Castle X509CertificateHolder object.
      * @return              Spongy Castle X509Certificate object.
      */
-    static X509Certificate certConverter(X509CertificateHolder certHolder) {
+    static X509Certificate certConverter(X509CertificateHolder certHolder) throws IllegalArgumentException {
         try {
             if (certHolder != null) {
                 X509Certificate certificate = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
                 if (certificate != null) {
                     return certificate;
                 }
+            } else {
+                throw new IllegalArgumentException();
             }
         } catch (CertificateException e) {
             e.printStackTrace();
