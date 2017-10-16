@@ -82,4 +82,7 @@
     <string name="dev_email">wesley.bunton@gmail.com</string>
     <string name="feedback_email_subject">My Certificates Error</string>
     <string name="no_mail_client_error">There are no email clients installed.</string>
+    <string name="device_not_supported">This action is not supported on this device.</string>
+    <string name="decode_error">Failed to decode PEM data.</string>
+    <string name="bc_error_msg">Bouncy Castle has returned a decoding error while trying to read this PEM data.</string>
 </resources>

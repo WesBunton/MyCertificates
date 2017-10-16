@@ -1,6 +1,8 @@
 package com.wesbunton.projects.mycertificates;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -89,28 +91,32 @@ public class MainActivity extends AppCompatActivity {
         btnListCerts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Prompt user to select certificate
-                KeyChain.choosePrivateKeyAlias(MainActivity.this, new KeyChainAliasCallback() {
-                    @Override
-                    public void alias(String alias) {
-                        // If user denies access to the selected certificate
-                        if (alias == null) {
-                            return;
-                        }
+                try {
+                    // Prompt user to select certificate
+                    KeyChain.choosePrivateKeyAlias(MainActivity.this, new KeyChainAliasCallback() {
+                        @Override
+                        public void alias(String alias) {
+                            // If user denies access to the selected certificate
+                            if (alias == null) {
+                                return;
+                            }
 
-                        // Pull data from KeyChain
-                        java.security.cert.X509Certificate[] chain;
-                        try {
-                            chain = KeyChain.getCertificateChain(MainActivity.this, alias);
-                        } catch (KeyChainException | InterruptedException e) {
-                            e.printStackTrace();
-                            MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
-                                    getString(R.string.error_msg_retrieve_store));
-                            return;
+                            // Pull data from KeyChain
+                            java.security.cert.X509Certificate[] chain;
+                            try {
+                                chain = KeyChain.getCertificateChain(MainActivity.this, alias);
+                            } catch (KeyChainException | InterruptedException e) {
+                                e.printStackTrace();
+                                MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error),
+                                        getString(R.string.error_msg_retrieve_store));
+                                return;
+                            }
+                            passCertDetails(chain, false);
                         }
-                        passCertDetails(chain, false);
-                    }
-                }, new String[] {}, null, null, -1, null);
+                    }, new String[]{}, null, null, -1, null);
+                } catch (ActivityNotFoundException e) {
+                    MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error), getString(R.string.device_not_supported));
+                }
             }
         });
 
@@ -312,7 +318,15 @@ public class MainActivity extends AppCompatActivity {
                 // Parse the PEM data
                 final Uri uri = data.getData();
                 X509CertificateHolder certHolder;
-                certHolder = MyCertificatesUtilities.parsePemFile(MainActivity.this, uri);
+
+                try {
+                    certHolder = MyCertificatesUtilities.parsePemFile(MainActivity.this, uri);
+                } catch (IllegalStateException e) {
+                    Log.e(LOGTAG, getString(R.string.bc_error_msg));
+                    MyCertificatesUtilities.showAlertDialog(MainActivity.this, getString(R.string.error), getString(R.string.decode_error));
+                    return;
+                }
+
                 if (certHolder == null) {
                     // Assume the file is a P12 certificate
                     processP12Certificate(MainActivity.this, uri);
@@ -520,6 +534,7 @@ public class MainActivity extends AppCompatActivity {
                     .setContentText(getString(R.string.tip_lock_screen))
                     .setDismissText("Okay!")
                     .build();
+            @SuppressLint("CutPasteId")
             MaterialShowcaseView issuerTip = new MaterialShowcaseView.Builder(this)
                     .setTarget(findViewById(R.id.btn_listCerts))
                     .withRectangleShape()
